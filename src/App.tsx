@@ -8,15 +8,6 @@ import HomePage from './pages/HomePage';
 // import viteLogo from './assets/vite.svg';
 
 function App() {
-  const { data: count, refetch } = useQueryCall({
-    functionName: 'get',
-  });
-
-  const { call: increment, loading } = useUpdateCall({
-    functionName: 'inc',
-    onSuccess: refetch,
-  });
-
   return (
     <Router>
       <Routes>
