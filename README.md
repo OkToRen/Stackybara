@@ -19,7 +19,7 @@ Ensure you have the following installed:
 
 ```bash
 # Clone the starter
-npx degit rvanasa/vite-react-motoko stackybara
+git clone http://github.com/OkToRen/Stackybara
 cd stackybara
 
 # Start local Internet Computer replica
@@ -29,5 +29,18 @@ dfx start --clean --background
 npm run setup
 
 # Start the development server
+npm start
+```
+
+### ⭐ Development
+
+```bash
+# if opening the project after a restart
+dfx start --clean --background
+
+# create the canisters
+dfx deploy
+
+# run the frontend and backend
 npm start
 ```

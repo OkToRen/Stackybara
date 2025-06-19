@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
 import dotenv from 'dotenv';
+import path from 'path';
 import { defineConfig } from 'vite';
 import environment from 'vite-plugin-environment';
 
@@ -8,6 +9,11 @@ dotenv.config();
 
 export default defineConfig({
   root: 'src',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'), // this points to /project-root/src
+    },
+  },
   build: {
     outDir: '../dist',
     emptyOutDir: true,
@@ -36,8 +42,4 @@ export default defineConfig({
     environment('all', { prefix: 'DFX_' }),
   ],
   cacheDir: '../node_modules/.vite',
-  test: {
-    environment: 'jsdom',
-    setupFiles: 'setupTests.ts',
-  },
 });
