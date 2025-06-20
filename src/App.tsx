@@ -4,10 +4,9 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Layout from './layout/Layout';
 import ProductsPage from './pages/ProductPage';
-// import motokoLogo from './assets/motoko_moving.png';
-// import motokoShadowLogo from './assets/motoko_shadow.png';
-// import reactLogo from './assets/react.svg';
-// import viteLogo from './assets/vite.svg';
+import AboutPage from './pages/AboutPage';
+import ProfilePage from './pages/ProfilePage';
+import CategoriesPage from './pages/CategoriesPage';
 
 function App() {
   return (
@@ -16,12 +15,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<HomePage />} />
-            <Route path="/products" element={<ProductsPage />} /> 
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/categories" element={<CategoriesPage />} />
           </Route>
-
-          {/* <Route path="/products" element={<ProductsPage />} />
-          <Route path="/categories" element={<div>Categories Page</div>} />
-          <Route path="/about" element={<div>About Page</div>} /> */}
         </Routes>
       </div>
     </Router>
