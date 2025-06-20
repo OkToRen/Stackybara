@@ -35,6 +35,13 @@ export default function AboutPage() {
         'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&face',
       bio: 'Digital marketing strategist and community builder',
     },
+    {
+      name: 'Emily Wang',
+      role: 'Head of Marketing',
+      image:
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&face',
+      bio: 'Digital marketing strategist and community builder',
+    },
   ];
 
   const values = [
@@ -260,7 +267,7 @@ export default function AboutPage() {
               The passionate people behind Stackybara
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
             {team.map((member, index) => (
               <Card
                 key={index}
