@@ -1,3 +1,5 @@
+import { useNavigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,11 +9,23 @@ import Logo from '@/assets/logo.png'; // Adjust the path as necessary
 import { useCart } from '@/lib/CartContext';
 
 export default function Header() {
+
   const { cart } = useCart();
   const location = useLocation();
-
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
   const isProductsRoute = location.pathname.startsWith('/products');
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    setSearchValue('');    
+    }, [location.pathname])
+
+  const handleSearch = () => {
+    if (searchValue.trim()) {
+      navigate(`/products?query=${encodeURIComponent(searchValue)}`);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-amber-200">
@@ -36,8 +50,13 @@ export default function Header() {
                 <Input
                   placeholder="Search for products, brands, and more..."
                   className="pl-10 pr-4 py-2 w-full border-amber-300 focus:border-teal-400 focus:ring-teal-400"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  onKeyDown={(e) => e.key == 'Enter' && handleSearch()}
                 />
-                <Button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white px-6">
+                <Button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white px-6"
+                  onClick={handleSearch}
+                >
                   Search
                 </Button>
               </div>

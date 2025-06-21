@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useState, useMemo } from 'react';
 import { Search, Filter, Grid, List, Star, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,6 +15,7 @@ import Header from '@/components/Header';
 import { useCart } from '@/lib/CartContext';
 
 export default function ProductsPage() {
+  const location = useLocation();
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -21,6 +24,12 @@ export default function ProductsPage() {
   const [sortOption, setSortOption] = useState('featured');
   const { addToCart, cart, decreaseFromCart } = useCart();
   const [cartMessage, setCartMessage] = useState<string | null>(null);
+
+  useEffect(() =>{
+    const params = new URLSearchParams(location.search);
+    const query = params.get('query') || '';
+    setSearchQuery(query);
+  }, [location.search]);
 
   const products = [
     {
