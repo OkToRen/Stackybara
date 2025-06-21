@@ -117,20 +117,25 @@ export default function ProductsPage() {
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       // Filter by search query
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch =
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Filter by category
-      const matchesCategory = selectedCategories.length === 0 || 
+      const matchesCategory =
+        selectedCategories.length === 0 ||
         selectedCategories.includes(product.category) ||
-        (selectedCategories.includes('All') && categories.includes(product.category));
+        (selectedCategories.includes('All') &&
+          categories.includes(product.category));
 
       // Filter by price
-      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+      const matchesPrice =
+        product.price >= priceRange[0] && product.price <= priceRange[1];
 
       // Filter by rating
-      const matchesRating = selectedRatings.length === 0 || 
-        selectedRatings.some(rating => product.rating >= rating);
+      const matchesRating =
+        selectedRatings.length === 0 ||
+        selectedRatings.some((rating) => product.rating >= rating);
 
       return matchesSearch && matchesCategory && matchesPrice && matchesRating;
     });
@@ -164,10 +169,10 @@ export default function ProductsPage() {
     if (category === 'All') {
       setSelectedCategories(selectedCategories.includes('All') ? [] : ['All']);
     } else {
-      setSelectedCategories(prev => {
-        const newCategories = prev.filter(c => c !== 'All');
+      setSelectedCategories((prev) => {
+        const newCategories = prev.filter((c) => c !== 'All');
         if (prev.includes(category)) {
-          return newCategories.filter(c => c !== category);
+          return newCategories.filter((c) => c !== category);
         } else {
           return [...newCategories, category];
         }
@@ -177,16 +182,21 @@ export default function ProductsPage() {
 
   // Handler for rating selection
   const handleRatingChange = (rating: number) => {
-    setSelectedRatings(prev => 
-      prev.includes(rating) 
-        ? prev.filter(r => r !== rating)
-        : [...prev, rating]
+    setSelectedRatings((prev) =>
+      prev.includes(rating)
+        ? prev.filter((r) => r !== rating)
+        : [...prev, rating],
     );
   };
 
   // Add to cart handler
-  const handleAddToCart = (product: typeof products[0]) => {
-    addToCart({ id: product.id, name: product.name, price: product.price, image: product.image });
+  const handleAddToCart = (product: (typeof products)[0]) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+    });
     setCartMessage(`${product.name} added to cart!`);
     setTimeout(() => setCartMessage(null), 2000);
   };
@@ -233,24 +243,114 @@ export default function ProductsPage() {
                   <h4 className="font-medium text-amber-900 mb-3">
                     Price Range
                   </h4>
-                  <div className="space-y-3">
-                    <input
-                      type="range"
-                      min="0"
-                      max="1000"
-                      value={priceRange[1]}
-                      onChange={(e) =>
-                        setPriceRange([
-                          priceRange[0],
-                          Number.parseInt(e.target.value),
-                        ])
-                      }
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-sm text-amber-700">
-                      <span>${priceRange[0]}</span>
-                      <span>${priceRange[1]}</span>
+                  <div className="space-y-4">
+                    {/* Manual Input Fields */}
+                    <div className="flex gap-3 items-center">
+                      <div className="flex-1">
+                        <label className="block text-xs text-amber-700 mb-1">
+                          Min Price
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-700 text-sm">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="1000"
+                            value={priceRange[0]}
+                            onChange={(e) => {
+                              const value = Math.max(
+                                0,
+                                Math.min(
+                                  Number(e.target.value) || 0,
+                                  priceRange[1],
+                                ),
+                              );
+                              setPriceRange([value, priceRange[1]]);
+                            }}
+                            className="w-full pl-6 pr-3 py-2 border border-amber-200 rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-xs text-amber-700 mb-1">
+                          Max Price
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-700 text-sm">
+                            $
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="1000"
+                            value={priceRange[1]}
+                            onChange={(e) => {
+                              const value = Math.max(
+                                priceRange[0],
+                                Math.min(Number(e.target.value) || 0, 1000),
+                              );
+                              setPriceRange([priceRange[0], value]);
+                            }}
+                            className="w-full pl-6 pr-3 py-2 border border-amber-200 rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            placeholder="1000"
+                          />
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Dual Range Sliders */}
+                    <div className="relative">
+                      {/* Min Range Slider */}
+                      <input
+                        type="range"
+                        min="0"
+                        max="1000"
+                        value={priceRange[0]}
+                        onChange={(e) => {
+                          const value = Math.min(
+                            Number(e.target.value),
+                            priceRange[1],
+                          );
+                          setPriceRange([value, priceRange[1]]);
+                        }}
+                        className="absolute w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer slider-thumb-amber"
+                        style={{ zIndex: 1 }}
+                      />
+                      {/* Max Range Slider */}
+                      <input
+                        type="range"
+                        min="0"
+                        max="1000"
+                        value={priceRange[1]}
+                        onChange={(e) => {
+                          const value = Math.max(
+                            Number(e.target.value),
+                            priceRange[0],
+                          );
+                          setPriceRange([priceRange[0], value]);
+                        }}
+                        className="absolute w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer slider-thumb-amber"
+                        style={{ zIndex: 2 }}
+                      />
+                      {/* Range Track Highlight */}
+                      <div
+                        className="absolute h-2 bg-amber-500 rounded-lg pointer-events-none"
+                        style={{
+                          left: `${(priceRange[0] / 1000) * 100}%`,
+                          width: `${((priceRange[1] - priceRange[0]) / 1000) * 100}%`,
+                          zIndex: 0,
+                        }}
+                      />
+                    </div>
+
+                    {/* Price Display
+                    <div className="flex justify-between text-sm text-amber-700 mt-2">
+                      <span>${priceRange[0].toLocaleString()}</span>
+                      <span>${priceRange[1].toLocaleString()}</span>
+                    </div> */}
                   </div>
                 </div>
 
@@ -300,7 +400,11 @@ export default function ProductsPage() {
                 />
               </div>
               <div className="flex gap-2">
-                <select className="w-40 border border-amber-300 rounded-md px-3 py-2" value={sortOption} onChange={e => setSortOption(e.target.value)}>
+                <select
+                  className="w-40 border border-amber-300 rounded-md px-3 py-2"
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value)}
+                >
                   <option value="featured">Featured</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
@@ -348,14 +452,16 @@ export default function ProductsPage() {
               }
             >
               {sortedProducts.map((product) => {
-                const cartItem = cart.find(item => item.id === product.id);
+                const cartItem = cart.find((item) => item.id === product.id);
                 return (
                   <Card
                     key={product.id}
                     className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
                   >
                     <div
-                      className={viewMode === 'list' ? 'w-48 flex-shrink-0' : ''}
+                      className={
+                        viewMode === 'list' ? 'w-48 flex-shrink-0' : ''
+                      }
                     >
                       <CardHeader className="p-0">
                         <div className="relative">
@@ -411,16 +517,45 @@ export default function ProductsPage() {
                       <CardFooter className="p-4 pt-0">
                         {cartItem ? (
                           <div className="flex items-center w-full gap-2">
-                            <Button size="sm" variant="outline" className="px-2 py-0" onClick={() => decreaseFromCart(product.id)}>-</Button>
-                            <span className="font-semibold text-amber-900">{cartItem.quantity}</span>
-                            <Button size="sm" variant="outline" className="px-2 py-0" onClick={() => addToCart({id: product.id, name: product.name, price: product.price, image: product.image})}>+</Button>
-                            <Button className="flex-1 bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="px-2 py-0"
+                              onClick={() => decreaseFromCart(product.id)}
+                            >
+                              -
+                            </Button>
+                            <span className="font-semibold text-amber-900">
+                              {cartItem.quantity}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="px-2 py-0"
+                              onClick={() =>
+                                addToCart({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: product.image,
+                                })
+                              }
+                            >
+                              +
+                            </Button>
+                            <Button
+                              className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
+                              onClick={() => handleAddToCart(product)}
+                            >
                               <ShoppingCart className="h-4 w-4 mr-2" />
                               Add More
                             </Button>
                           </div>
                         ) : (
-                          <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
+                          <Button
+                            className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                            onClick={() => handleAddToCart(product)}
+                          >
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Add to Cart
                           </Button>

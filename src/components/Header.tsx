@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,9 @@ import { useCart } from '@/lib/CartContext';
 
 export default function Header() {
   const { cart } = useCart();
+  const location = useLocation();
+
+  const isProductsRoute = location.pathname.startsWith('/products');
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -26,18 +29,20 @@ export default function Header() {
           </Link>
 
           {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 h-4 w-4" />
-              <Input
-                placeholder="Search for products, brands, and more..."
-                className="pl-10 pr-4 py-2 w-full border-amber-300 focus:border-teal-400 focus:ring-teal-400"
-              />
-              <Button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white px-6">
-                Search
-              </Button>
+          {!isProductsRoute && (
+            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 h-4 w-4" />
+                <Input
+                  placeholder="Search for products, brands, and more..."
+                  className="pl-10 pr-4 py-2 w-full border-amber-300 focus:border-teal-400 focus:ring-teal-400"
+                />
+                <Button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white px-6">
+                  Search
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation */}
           <div className="flex items-center space-x-4">
