@@ -1,7 +1,7 @@
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState, useMemo } from 'react';
-import { Search, Filter, Grid, List, Star, ShoppingCart } from 'lucide-react';
+import { Search, Filter, Grid, List, Star, ShoppingCart, RotateCcw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -9,10 +9,15 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import Header from '@/components/Header';
 import { useCart } from '@/lib/CartContext';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
+import { Separator } from "@/components/ui/separator";
 
 export default function ProductsPage() {
   const location = useLocation();
@@ -131,8 +136,7 @@ export default function ProductsPage() {
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
 
       // Filter by category
-      const matchesCategory =
-        selectedCategories.length === 0 ||
+      const matchesCategory = selectedCategories.length === 0 ||
         selectedCategories.includes(product.category) ||
         (selectedCategories.includes('All') &&
           categories.includes(product.category));
@@ -142,9 +146,8 @@ export default function ProductsPage() {
         product.price >= priceRange[0] && product.price <= priceRange[1];
 
       // Filter by rating
-      const matchesRating =
-        selectedRatings.length === 0 ||
-        selectedRatings.some((rating) => product.rating >= rating);
+      const matchesRating = selectedRatings.length === 0 ||
+        selectedRatings.some(rating => product.rating >= rating);
 
       return matchesSearch && matchesCategory && matchesPrice && matchesRating;
     });
@@ -191,10 +194,10 @@ export default function ProductsPage() {
 
   // Handler for rating selection
   const handleRatingChange = (rating: number) => {
-    setSelectedRatings((prev) =>
+    setSelectedRatings(prev =>
       prev.includes(rating)
-        ? prev.filter((r) => r !== rating)
-        : [...prev, rating],
+        ? prev.filter(r => r !== rating)
+        : [...prev, rating]
     );
   };
 
@@ -210,187 +213,278 @@ export default function ProductsPage() {
     setTimeout(() => setCartMessage(null), 2000);
   };
 
+  const hasActiveFilters =
+    selectedCategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000 || selectedRatings.length > 0
+
+  const clearAllFilters = () => {
+    setSelectedCategories([])
+    setPriceRange([0, 1000])
+    setSelectedRatings([])
+  }
+
+  const removeRating = (rating: number) => {
+    setSelectedRatings((prev) => prev.filter((r) => r !== rating))
+  }
+
+  const removeCategory = (category: string) => {
+    setSelectedCategories((prev) => prev.filter((c) => c !== category))
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
-            <Card className="border-amber-200">
-              <CardHeader>
-                <h3 className="font-semibold text-amber-900 flex items-center">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Filters
-                </h3>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Categories */}
-                <div>
-                  <h4 className="font-medium text-amber-900 mb-3">
-                    Categories
-                  </h4>
-                  <div className="space-y-2">
-                    {categories.map((category) => (
-                      <label
+          <div className="w-full max-w-sm">
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg">
+                      <Filter className="h-4 w-4 text-amber-600" />
+                    </div>
+                    <span className="text-lg font-semibold text-slate-800">Filters</span>
+                  </div>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearAllFilters}
+                      className="text-slate-500 hover:text-slate-700 h-8 px-2"
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Clear
+                    </Button>
+                  )}
+                </CardTitle>
+
+                {/* Active Filters Summary */}
+                {hasActiveFilters && (
+                  <div className="flex flex-wrap gap-1 mt-3">
+                    {selectedCategories.map((category) => (
+                      <Badge
                         key={category}
-                        className="flex items-center space-x-2 cursor-pointer"
+                        variant="secondary"
+                        className="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200"
                       >
-                        <input
-                          type="checkbox"
-                          className="rounded border-amber-300"
-                          checked={selectedCategories.includes(category)}
-                          onChange={() => handleCategoryChange(category)}
-                        />
-                        <span className="text-amber-800">{category}</span>
-                      </label>
+                        {category}
+                        <button
+                          onClick={() => removeCategory(category)}
+                          className="ml-1 hover:bg-blue-300 rounded-full p-0.5"
+                        >
+                          <X className="h-2 w-2" />
+                        </button>
+                      </Badge>
                     ))}
-                  </div>
-                </div>
-
-                {/* Price Range */}
-                <div>
-                  <h4 className="font-medium text-amber-900 mb-3">
-                    Price Range
-                  </h4>
-                  <div className="space-y-4">
-                    {/* Manual Input Fields */}
-                    <div className="flex gap-3 items-center">
-                      <div className="flex-1">
-                        <label className="block text-xs text-amber-700 mb-1">
-                          Min Price
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-700 text-sm">
-                            $
-                          </span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="1000"
-                            value={priceRange[0]}
-                            onChange={(e) => {
-                              const value = Math.max(
-                                0,
-                                Math.min(
-                                  Number(e.target.value) || 0,
-                                  priceRange[1],
-                                ),
-                              );
-                              setPriceRange([value, priceRange[1]]);
-                            }}
-                            className="w-full pl-6 pr-3 py-2 border border-amber-200 rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <label className="block text-xs text-amber-700 mb-1">
-                          Max Price
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-700 text-sm">
-                            $
-                          </span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="1000"
-                            value={priceRange[1]}
-                            onChange={(e) => {
-                              const value = Math.max(
-                                priceRange[0],
-                                Math.min(Number(e.target.value) || 0, 1000),
-                              );
-                              setPriceRange([priceRange[0], value]);
-                            }}
-                            className="w-full pl-6 pr-3 py-2 border border-amber-200 rounded-md text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                            placeholder="1000"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dual Range Sliders */}
-                    <div className="relative">
-                      {/* Min Range Slider */}
-                      <input
-                        type="range"
-                        min="0"
-                        max="1000"
-                        value={priceRange[0]}
-                        onChange={(e) => {
-                          const value = Math.min(
-                            Number(e.target.value),
-                            priceRange[1],
-                          );
-                          setPriceRange([value, priceRange[1]]);
-                        }}
-                        className="absolute w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer slider-thumb-amber"
-                        style={{ zIndex: 1 }}
-                      />
-                      {/* Max Range Slider */}
-                      <input
-                        type="range"
-                        min="0"
-                        max="1000"
-                        value={priceRange[1]}
-                        onChange={(e) => {
-                          const value = Math.max(
-                            Number(e.target.value),
-                            priceRange[0],
-                          );
-                          setPriceRange([priceRange[0], value]);
-                        }}
-                        className="absolute w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer slider-thumb-amber"
-                        style={{ zIndex: 2 }}
-                      />
-                      {/* Range Track Highlight */}
-                      <div
-                        className="absolute h-2 bg-amber-500 rounded-lg pointer-events-none"
-                        style={{
-                          left: `${(priceRange[0] / 1000) * 100}%`,
-                          width: `${((priceRange[1] - priceRange[0]) / 1000) * 100}%`,
-                          zIndex: 0,
-                        }}
-                      />
-                    </div>
-
-                    {/* Price Display
-                    <div className="flex justify-between text-sm text-amber-700 mt-2">
-                      <span>${priceRange[0].toLocaleString()}</span>
-                      <span>${priceRange[1].toLocaleString()}</span>
-                    </div> */}
-                  </div>
-                </div>
-
-                {/* Rating */}
-                <div>
-                  <h4 className="font-medium text-amber-900 mb-3">Rating</h4>
-                  <div className="space-y-2">
-                    {[5, 4, 3, 2, 1].map((rating) => (
-                      <label
+                    {selectedRatings.map((rating) => (
+                      <Badge
                         key={rating}
-                        className="flex items-center space-x-2 cursor-pointer"
+                        variant="secondary"
+                        className="text-xs bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
                       >
-                        <input
-                          type="checkbox"
-                          className="rounded border-amber-300"
-                          checked={selectedRatings.includes(rating)}
-                          onChange={() => handleRatingChange(rating)}
-                        />
-                        <div className="flex items-center">
-                          {Array.from({ length: rating }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className="h-3 w-3 fill-yellow-400 text-yellow-400"
-                            />
-                          ))}
-                          <span className="text-amber-800 ml-1">& up</span>
-                        </div>
-                      </label>
+                        {rating}+ stars
+                        <button onClick={() => removeRating(rating)} className="ml-1 hover:bg-yellow-300 rounded-full p-0.5">
+                          <X className="h-2 w-2" />
+                        </button>
+                      </Badge>
                     ))}
+                    {(priceRange[0] > 0 || priceRange[1] < 1000) && (
+                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                        ${priceRange[0]} - ${priceRange[1]}
+                      </Badge>
+                    )}
                   </div>
-                </div>
+                )}
+              </CardHeader>
+
+              <CardContent className="space-y-6">
+                <Accordion type="multiple" defaultValue={["categories", "price", "rating"]} className="w-full">
+                  {/* Categories */}
+                  <AccordionItem value="categories" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-3 px-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-700">Categories</span>
+                        {selectedCategories.length > 0 && (
+                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
+                            {selectedCategories.length}
+                          </Badge>
+                        )}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
+                      <div className="grid gap-3">
+                        {categories.map((category) => (
+                          <div key={category} className="flex items-center space-x-3 group">
+                            <Checkbox
+                              id={`category-${category}`}
+                              checked={selectedCategories.includes(category)}
+                              onCheckedChange={() => handleCategoryChange(category)}
+                              className="data-[state=checked]:bg-white-600 data-[state=checked]:border-blue-600"
+                            />
+                            <Label
+                              htmlFor={`category-${category}`}
+                              className="text-sm font-medium text-slate-600 cursor-pointer group-hover:text-slate-800 transition-colors"
+                            >
+                              {category}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <Separator className="my-2" />
+
+                  {/* Price Range */}
+                  <AccordionItem value="price" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-3 px-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-700">Price Range</span>
+                        {(priceRange[0] > 0 || priceRange[1] < 1000) && (
+                          <Badge variant="outline" className="text-xs bg-green-50 text-green-600 border-green-200">
+                            ${priceRange[0]} - ${priceRange[1]}
+                          </Badge>
+                        )}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <Label htmlFor="min-price" className="text-xs text-slate-500 mb-1 block">
+                              Min Price
+                            </Label>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 text-sm">
+                                $
+                              </span>
+                              <Input
+                                id="min-price"
+                                type="number"
+                                min="0"
+                                max={priceRange[1]}
+                                value={priceRange[0]}
+                                onChange={(e) => {
+                                  const val = Math.min(Number(e.target.value) || 0, priceRange[1]);
+                                  setPriceRange([val, priceRange[1]]);
+                                }}
+                                className="pl-7 text-center border-slate-300 focus:border-blue-500"
+                                placeholder="0"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-center pt-6">
+                            <div className="w-4 h-px bg-slate-300"></div>
+                          </div>
+
+                          <div className="flex-1">
+                            <Label htmlFor="max-price" className="text-xs text-slate-500 mb-1 block">
+                              Max Price
+                            </Label>
+                            <div className="relative">
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500 text-sm">
+                                $
+                              </span>
+                              <Input
+                                id="max-price"
+                                type="number"
+                                min={priceRange[0]}
+                                max="10000"
+                                value={priceRange[1]}
+                                onChange={(e) => {
+                                  const val = Math.max(Number(e.target.value) || 0, priceRange[0]);
+                                  setPriceRange([priceRange[0], val]);
+                                }}
+                                className="pl-7 text-center border-slate-300 focus:border-blue-500"
+                                placeholder="1000"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Quick Price Range Buttons */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([0, 50])}
+                            className="text-xs h-8 border-slate-300 hover:bg-slate-50"
+                          >
+                            Under $50
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([50, 100])}
+                            className="text-xs h-8 border-slate-300 hover:bg-slate-50"
+                          >
+                            $50 - $100
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([100, 200])}
+                            className="text-xs h-8 border-slate-300 hover:bg-slate-50"
+                          >
+                            $100 - $200
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPriceRange([200, 1000])}
+                            className="text-xs h-8 border-slate-300 hover:bg-slate-50"
+                          >
+                            $200+
+                          </Button>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <Separator className="my-2" />
+
+                  {/* Rating */}
+                  <AccordionItem value="rating" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-3 px-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-700">Rating</span>
+                        {selectedRatings.length > 0 && (
+                          <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-600 border-yellow-200">
+                            {selectedRatings.length}
+                          </Badge>
+                        )}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4">
+                      <div className="grid gap-3">
+                        {[5, 4, 3, 2, 1].map((rating) => (
+                          <div key={rating} className="flex items-center space-x-3 group">
+                            <Checkbox
+                              id={`rating-${rating}`}
+                              checked={selectedRatings.includes(rating)}
+                              onCheckedChange={() => handleRatingChange(rating)}
+                              className="data-[state=checked]:bg-white-500 data-[state=checked]:border-yellow-500"
+                            />
+                            <Label
+                              htmlFor={`rating-${rating}`}
+                              className="flex items-center cursor-pointer group-hover:opacity-80 transition-opacity"
+                            >
+                              <div className="flex items-center gap-1">
+                                {Array.from({ length: rating }).map((_, i) => (
+                                  <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                                ))}
+                                {Array.from({ length: 5 - rating }).map((_, i) => (
+                                  <Star key={i + rating} className="h-3.5 w-3.5 text-slate-300" />
+                                ))}
+                                <span className="text-sm font-medium text-slate-600 ml-2">{rating} & up</span>
+                              </div>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
             </Card>
           </div>
@@ -526,36 +620,10 @@ export default function ProductsPage() {
                       <CardFooter className="p-4 pt-0">
                         {cartItem ? (
                           <div className="flex items-center w-full gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="px-2 py-0"
-                              onClick={() => decreaseFromCart(product.id)}
-                            >
-                              -
-                            </Button>
-                            <span className="font-semibold text-amber-900">
-                              {cartItem.quantity}
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="px-2 py-0"
-                              onClick={() =>
-                                addToCart({
-                                  id: product.id,
-                                  name: product.name,
-                                  price: product.price,
-                                  image: product.image,
-                                })
-                              }
-                            >
-                              +
-                            </Button>
-                            <Button
-                              className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
-                              onClick={() => handleAddToCart(product)}
-                            >
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={() => decreaseFromCart(product.id)}>-</Button>
+                            <span className="font-semibold text-amber-900">{cartItem.quantity}</span>
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image })}>+</Button>
+                            <Button className="flex-1 bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
                               <ShoppingCart className="h-4 w-4 mr-2" />
                               Add More
                             </Button>
