@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
+import { useCart } from '@/lib/CartContext';
 
 export default function ProductsPage() {
   const [viewMode, setViewMode] = useState('grid');
@@ -18,6 +19,8 @@ export default function ProductsPage() {
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('featured');
+  const { addToCart, cart } = useCart();
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   const products = [
     {
@@ -181,6 +184,13 @@ export default function ProductsPage() {
     );
   };
 
+  // Add to cart handler
+  const handleAddToCart = (product: typeof products[0]) => {
+    addToCart({ id: product.id, name: product.name, price: product.price, image: product.image });
+    setCartMessage(`${product.name} added to cart!`);
+    setTimeout(() => setCartMessage(null), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
@@ -322,6 +332,13 @@ export default function ProductsPage() {
               </div>
             </div>
 
+            {/* Cart Message */}
+            {cartMessage && (
+              <div className="fixed top-4 right-4 bg-teal-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
+                {cartMessage}
+              </div>
+            )}
+
             {/* Products Grid/List */}
             <div
               className={
@@ -390,7 +407,7 @@ export default function ProductsPage() {
                       </div>
                     </CardContent>
                     <CardFooter className="p-4 pt-0">
-                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">
+                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
                         <ShoppingCart className="h-4 w-4 mr-2" />
                         Add to Cart
                       </Button>

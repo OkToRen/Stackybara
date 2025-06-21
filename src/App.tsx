@@ -12,29 +12,34 @@ import DashboardPage from './pages/DashboardPage';
 import ProductManagerPage from './pages/ProductManagerPage';
 import OrderPage from './pages/OrderPage';
 import StoreProfilePage from './pages/StoreProfilePage';
+import { CartProvider } from './lib/CartContext';
+import CartPage from './pages/CartPage';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<HomePage />} />
-            {/* <Route path="categories" element={<CategoriesPage />} /> */}
-            <Route path="products" element={<ProductsPage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-          </Route>
+    <CartProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<HomePage />} />
+              {/* <Route path="categories" element={<CategoriesPage />} /> */}
+              <Route path="products" element={<ProductsPage />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="cart" element={<CartPage />} />
+            </Route>
 
-          <Route path="/seller/" element={<SellerLayout />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="productmanager" element={<ProductManagerPage />} />
-            <Route path="orders" element={<OrderPage />} />
-            <Route path="profile" element={<StoreProfilePage />} />
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+            <Route path="/seller/" element={<SellerLayout />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="productmanager" element={<ProductManagerPage />} />
+              <Route path="orders" element={<OrderPage />} />
+              <Route path="profile" element={<StoreProfilePage />} />
+            </Route>
+          </Routes>
+        </div>
+      </Router>
+    </CartProvider>
   );
 }
 

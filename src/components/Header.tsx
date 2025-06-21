@@ -4,8 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import Logo from '@/assets/logo.png'; // Adjust the path as necessary
+import { useCart } from '@/lib/CartContext';
 
 export default function Header() {
+  const { cart } = useCart();
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-amber-200">
       <div className="container mx-auto px-4 py-3">
@@ -71,10 +75,12 @@ export default function Header() {
               size="icon"
               className="text-amber-800 hover:text-teal-600 relative"
             >
-              <ShoppingCart className="h-5 w-5" />
-              <Badge className="absolute -top-2 -right-2 bg-teal-500 text-white text-xs px-1.5 py-0.5">
-                3
-              </Badge>
+              <Link to={'/cart'} className="flex items-center">
+                <ShoppingCart className="h-5 w-5" />
+                <Badge className="absolute -top-2 -right-2 bg-teal-500 text-white text-xs px-1.5 py-0.5">
+                  {cartCount}
+                </Badge>
+              </Link>
             </Button>
             <Button
               variant="ghost"
