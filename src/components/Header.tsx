@@ -42,9 +42,6 @@ export default function Header() {
           {/* Navigation */}
           <div className="flex items-center space-x-4">
             <nav className="hidden md:flex space-x-6 mr-4">
-              <Link to="/" className="text-amber-800 hover:text-teal-600">
-                Home
-              </Link>
               <Link
                 to="/products"
                 className="text-amber-800 hover:text-teal-600"
