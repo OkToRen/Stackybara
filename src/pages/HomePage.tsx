@@ -98,14 +98,14 @@ export default function HomePage() {
     },
   ];
 
-  const categories = [
-    { name: 'Electronics', icon: '📱', count: '2,340 items' },
-    { name: 'Fashion', icon: '👕', count: '1,890 items' },
-    { name: 'Home & Garden', icon: '🏠', count: '1,567 items' },
-    { name: 'Sports', icon: '⚽', count: '987 items' },
-    { name: 'Books', icon: '📚', count: '3,456 items' },
-    { name: 'Beauty', icon: '💄', count: '1,234 items' },
-  ];
+  // const categories = [
+  //   { name: 'Electronics', icon: '📱', count: '2,340 items' },
+  //   { name: 'Fashion', icon: '👕', count: '1,890 items' },
+  //   { name: 'Home & Garden', icon: '🏠', count: '1,567 items' },
+  //   { name: 'Sports', icon: '⚽', count: '987 items' },
+  //   { name: 'Books', icon: '📚', count: '3,456 items' },
+  //   { name: 'Beauty', icon: '💄', count: '1,234 items' },
+  // ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
@@ -223,7 +223,7 @@ export default function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((category, index) => (
+            {/* {categories.map((category, index) => (
               <Link key={index} to={`/category/${category.name.toLowerCase()}`}>
                 <Card className="border-amber-200 hover:shadow-lg hover:scale-105 transition-all cursor-pointer">
                   <CardContent className="p-6 text-center">
@@ -235,7 +235,7 @@ export default function HomePage() {
                   </CardContent>
                 </Card>
               </Link>
-            ))}
+            ))} */}
           </div>
         </div>
       </section>

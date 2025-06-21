@@ -32,12 +32,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
+                {/* <Link
                   to="/categories"
                   className="hover:text-teal-300 transition-colors"
                 >
                   Categories
-                </Link>
+                </Link> */}
               </li>
               <li>
                 <Link

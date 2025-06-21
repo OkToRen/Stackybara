@@ -47,12 +47,12 @@ export default function Header() {
               >
                 Products
               </Link>
-              <Link
+              {/* <Link
                 to="/categories"
                 className="text-amber-800 hover:text-teal-600"
               >
                 Categories
-              </Link>
+              </Link> */}
               <Link to="/about" className="text-amber-800 hover:text-teal-600">
                 About
               </Link>
