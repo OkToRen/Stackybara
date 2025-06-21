@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
 export default function CartPage() {
-  const { cart } = useCart();
+  const { cart, addToCart, removeFromCart, decreaseFromCart } = useCart();
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
@@ -26,9 +26,15 @@ export default function CartPage() {
                   <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded mr-4 border border-amber-200" />
                   <div className="flex-1">
                     <div className="font-semibold text-amber-900">{item.name}</div>
-                    <div className="text-amber-700 text-sm">${item.price} x {item.quantity}</div>
+                    <div className="text-amber-700 text-sm flex items-center gap-2">
+                      ${item.price} x
+                      <Button size="sm" variant="outline" className="px-2 py-0" onClick={() => decreaseFromCart(item.id)}>-</Button>
+                      <span className="mx-1">{item.quantity}</span>
+                      <Button size="sm" variant="outline" className="px-2 py-0" onClick={() => addToCart({id: item.id, name: item.name, price: item.price, image: item.image})}>+</Button>
+                    </div>
                   </div>
                   <div className="font-bold text-amber-900 ml-4">${(item.price * item.quantity).toFixed(2)}</div>
+                  <Button size="sm" variant="ghost" className="ml-4 text-red-500" onClick={() => removeFromCart(item.id)}>Remove</Button>
                 </li>
               ))}
             </ul>

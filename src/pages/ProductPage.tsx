@@ -19,7 +19,7 @@ export default function ProductsPage() {
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('featured');
-  const { addToCart, cart } = useCart();
+  const { addToCart, cart, decreaseFromCart } = useCart();
   const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   const products = [
@@ -347,74 +347,89 @@ export default function ProductsPage() {
                   : 'space-y-4'
               }
             >
-              {sortedProducts.map((product) => (
-                <Card
-                  key={product.id}
-                  className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
-                >
-                  <div
-                    className={viewMode === 'list' ? 'w-48 flex-shrink-0' : ''}
+              {sortedProducts.map((product) => {
+                const cartItem = cart.find(item => item.id === product.id);
+                return (
+                  <Card
+                    key={product.id}
+                    className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
                   >
-                    <CardHeader className="p-0">
-                      <div className="relative">
-                        <img
-                          src={product.image || '/placeholder.svg'}
-                          alt={product.name}
-                          className={`object-cover ${viewMode === 'list' ? 'w-full h-32 rounded-l-lg' : 'w-full h-48 rounded-t-lg'}`}
-                        />
-                        <Badge className="absolute top-2 left-2 bg-teal-500 text-white text-xs">
-                          {product.badge}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                  </div>
-                  <div className="flex-1">
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-amber-900 mb-2 group-hover:text-teal-600 transition-colors">
-                        {product.name}
-                      </h3>
-                      {viewMode === 'list' && (
-                        <p className="text-sm text-amber-700 mb-2">
-                          {product.description}
-                        </p>
-                      )}
-                      <div className="flex items-center mb-2">
-                        <div className="flex items-center">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm text-amber-700 ml-1">
-                            {product.rating}
-                          </span>
-                          <span className="text-sm text-amber-600 ml-1">
-                            ({product.reviews})
-                          </span>
+                    <div
+                      className={viewMode === 'list' ? 'w-48 flex-shrink-0' : ''}
+                    >
+                      <CardHeader className="p-0">
+                        <div className="relative">
+                          <img
+                            src={product.image || '/placeholder.svg'}
+                            alt={product.name}
+                            className={`object-cover ${viewMode === 'list' ? 'w-full h-32 rounded-l-lg' : 'w-full h-48 rounded-t-lg'}`}
+                          />
+                          <Badge className="absolute top-2 left-2 bg-teal-500 text-white text-xs">
+                            {product.badge}
+                          </Badge>
                         </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-lg font-bold text-amber-900">
-                            ${product.price}
-                          </span>
-                          <span className="text-sm text-amber-600 line-through">
-                            ${product.originalPrice}
-                          </span>
+                      </CardHeader>
+                    </div>
+                    <div className="flex-1">
+                      <CardContent className="p-4">
+                        <h3 className="font-semibold text-amber-900 mb-2 group-hover:text-teal-600 transition-colors">
+                          {product.name}
+                        </h3>
+                        {viewMode === 'list' && (
+                          <p className="text-sm text-amber-700 mb-2">
+                            {product.description}
+                          </p>
+                        )}
+                        <div className="flex items-center mb-2">
+                          <div className="flex items-center">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm text-amber-700 ml-1">
+                              {product.rating}
+                            </span>
+                            <span className="text-sm text-amber-600 ml-1">
+                              ({product.reviews})
+                            </span>
+                          </div>
                         </div>
-                        <Badge
-                          variant="outline"
-                          className="border-amber-300 text-amber-700"
-                        >
-                          {product.category}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="p-4 pt-0">
-                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
-                        <ShoppingCart className="h-4 w-4 mr-2" />
-                        Add to Cart
-                      </Button>
-                    </CardFooter>
-                  </div>
-                </Card>
-              ))}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-lg font-bold text-amber-900">
+                              ${product.price}
+                            </span>
+                            <span className="text-sm text-amber-600 line-through">
+                              ${product.originalPrice}
+                            </span>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="border-amber-300 text-amber-700"
+                          >
+                            {product.category}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="p-4 pt-0">
+                        {cartItem ? (
+                          <div className="flex items-center w-full gap-2">
+                            <Button size="sm" variant="outline" className="px-2 py-0" onClick={() => decreaseFromCart(product.id)}>-</Button>
+                            <span className="font-semibold text-amber-900">{cartItem.quantity}</span>
+                            <Button size="sm" variant="outline" className="px-2 py-0" onClick={() => addToCart({id: product.id, name: product.name, price: product.price, image: product.image})}>+</Button>
+                            <Button className="flex-1 bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
+                              <ShoppingCart className="h-4 w-4 mr-2" />
+                              Add More
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            Add to Cart
+                          </Button>
+                        )}
+                      </CardFooter>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
 
             {/* Pagination */}
