@@ -11,9 +11,6 @@ export default function SellerHeader() {
         <Link to="/seller" className="flex items-center gap-2">
           <img src={Logo} alt="ShoppyBara Logo" className="h-8 w-8" />
           <span className="font-bold text-xl text-amber-900">ShoppyBara</span>
-          <span className="text-sm font-medium text-teal-600 border-l-2 pl-3 ml-3">
-            Seller Centre
-          </span>
         </Link>
 
         {/* Right Side: Navigation and User */}

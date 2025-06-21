@@ -1,15 +1,16 @@
 // src/pages/seller/StoreProfilePage.tsx
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { ReviewCard, type Review } from '@/components/ui/reviewcard';
-import { MapPin, Calendar, Edit, Star, Package } from 'lucide-react';
+import { MapPin, Calendar, Edit, Star, Package, Save, XCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from '@/assets/logo.png';
 
 // --- Sample Data (Re-adding bannerUrl) ---
-const storeInfo = {
+const initialStoreInfo = {
   name: "The Capy Store",
   tagline: "Home of the finest digital goods",
   bannerUrl: "https://images.unsplash.com/photo-1554034483-04fda0d3507b?w=800&h=200&fit=crop",
@@ -31,6 +32,48 @@ const reviews: Review[] = [
 
 export default function StoreProfilePage() {
   const [activeTab, setActiveTab] = useState('products');
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // State for the store info, which can now be updated
+  const [storeInfo, setStoreInfo] = useState(initialStoreInfo);
+  
+  // Temporary state for form fields while editing
+  const [formData, setFormData] = useState({
+    name: storeInfo.name,
+    tagline: storeInfo.tagline,
+    location: storeInfo.location, // Added location to form state
+  });
+
+  useEffect(() => {
+    // Sync form data if storeInfo changes from an external source
+    setFormData({
+      name: storeInfo.name,
+      tagline: storeInfo.tagline,
+      location: storeInfo.location, // Sync location
+    });
+  }, [storeInfo]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveChanges = () => {
+    // In a real app, call the backend updateUser function here
+    console.log("Saving changes:", formData);
+    setStoreInfo(prev => ({ ...prev, ...formData }));
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    // Reset form to original data on cancel
+    setFormData({
+      name: storeInfo.name,
+      tagline: storeInfo.tagline,
+      location: storeInfo.location,
+    });
+    setIsEditing(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
@@ -43,19 +86,35 @@ export default function StoreProfilePage() {
       </div>
       
       <div className="container mx-auto px-4 sm:px-8">
-        {/* ================================================================== */}
-        {/* FINAL CORRECTED PROFILE HEADER */}
-        {/* ================================================================== */}
+        {/* Profile Card Section */}
         <Card className="relative -mt-20 overflow-hidden border-amber-200 shadow-lg">
-          {/* Top Teal Section - Reduced height */}
           <div className="h-20 bg-gradient-to-r from-teal-500 to-emerald-600" />
           
-          {/* Bottom White Section */}
           <div className="bg-white px-6 pb-6">
-            {/* Store details are pushed down to make space for the overlapping avatar */}
-            <div className="pt-12 text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-amber-950">{storeInfo.name}</h1>
-              <p className="text-sm text-amber-700">{storeInfo.tagline}</p>
+            <div className="pt-12">
+              {isEditing ? (
+                // EDITING VIEW
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="name" className="text-xs font-medium text-amber-700">Store Name</label>
+                    <Input id="name" name="name" value={formData.name} onChange={handleInputChange} className="text-2xl font-bold" />
+                  </div>
+                  <div>
+                    <label htmlFor="tagline" className="text-xs font-medium text-amber-700">Tagline</label>
+                    <Input id="tagline" name="tagline" value={formData.tagline} onChange={handleInputChange} />
+                  </div>
+                  <div>
+                    <label htmlFor="location" className="text-xs font-medium text-amber-700">Location</label>
+                    <Input id="location" name="location" value={formData.location} onChange={handleInputChange} />
+                  </div>
+                </div>
+              ) : (
+                // DISPLAY VIEW
+                <div className="text-center sm:text-left">
+                  <h1 className="text-2xl font-bold text-amber-950">{storeInfo.name}</h1>
+                  <p className="text-sm text-amber-700">{storeInfo.tagline}</p>
+                </div>
+              )}
             </div>
             <hr className="my-3 border-amber-100" />
             <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 sm:gap-x-6 gap-y-2 text-sm text-amber-800">
@@ -65,7 +124,6 @@ export default function StoreProfilePage() {
             </div>
           </div>
           
-          {/* Absolutely Positioned Elements that sit on top - Adjusted positions */}
           <div className="absolute top-8 left-6">
             <Avatar className="h-24 w-24 border-4 border-white shadow-md">
               <AvatarImage src={storeInfo.logoUrl} alt={`${storeInfo.name} logo`} />
@@ -73,16 +131,27 @@ export default function StoreProfilePage() {
             </Avatar>
           </div>
           <div className="absolute top-4 right-4">
-            <Button variant="outline" className="bg-white/90 hover:bg-white text-teal-700 border-teal-200 shadow">
-              <Edit className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Edit Profile</span>
-            </Button>
+            {isEditing ? (
+              // SAVE / CANCEL BUTTONS
+              <div className="flex gap-2">
+                <Button onClick={handleCancel} variant="ghost" size="sm" className="bg-white/90 text-red-600 hover:bg-red-50">
+                  <XCircle className="h-4 w-4 mr-1"/> Cancel
+                </Button>
+                <Button onClick={handleSaveChanges} size="sm" className="bg-teal-500 hover:bg-teal-600 text-white">
+                  <Save className="h-4 w-4 mr-1"/> Save
+                </Button>
+              </div>
+            ) : (
+              // EDIT BUTTON
+              <Button onClick={() => setIsEditing(true)} variant="outline" className="bg-white/90 hover:bg-white text-teal-700 border-teal-200 shadow">
+                <Edit className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Edit Profile</span>
+              </Button>
+            )}
           </div>
         </Card>
       
-        {/* ================================================================== */}
-        {/* TAB NAVIGATION AND CONTENT (No changes needed) */}
-        {/* ================================================================== */}
+        {/* TAB NAVIGATION AND CONTENT */}
         <div className="mt-8">
           <div className="border-b border-amber-200">
             <nav className="flex space-x-6">

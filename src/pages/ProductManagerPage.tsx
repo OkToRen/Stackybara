@@ -1,8 +1,10 @@
+// src/pages/seller/ProductManagerPage.tsx
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, PlusCircle, Settings, ArrowLeft } from "lucide-react";
+import { Search, PlusCircle, Settings, ArrowLeft, UploadCloud, X } from "lucide-react";
 
 // Sample Data: In a real app, this would come from a backend call
 const sellerProducts = [
@@ -34,26 +36,44 @@ export default function ProductManagerPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const clearForm = () => {
+    setName('');
+    setDescription('');
+    setPrice('');
+    setImage(null);
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview); // Clean up the object URL
+    }
+    setImagePreview(null);
+  };
 
   const handleShowAddForm = () => {
     setView('form');
   };
 
   const handleShowListView = () => {
-    // Clear form fields when canceling
-    setName('');
-    setDescription('');
-    setPrice('');
+    clearForm();
     setView('list');
   };
 
   const handleSubmitProduct = () => {
-    if (!name || !price) {
-      alert('Please fill out at least Name and Price.');
+    if (!name || !price || !image) {
+      alert('Please fill out all fields and upload an image.');
       return;
     }
-    console.log('Adding new product:', { name, description, price });
-    // In a real app, you would call the backend canister here.
+    console.log('Adding new product:', { name, description, price, imageName: image.name });
+    // In a real app, you would handle the file upload to the backend here.
     // After a successful submission, switch back to the list view.
     handleShowListView();
   };
@@ -123,6 +143,27 @@ export default function ProductManagerPage() {
                 <CardTitle className="text-amber-900">Add a New Product</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <label className="font-medium text-amber-800">Product Image</label>
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img src={imagePreview} alt="Product preview" className="w-full h-48 object-cover rounded-lg" />
+                      <Button onClick={() => { setImage(null); setImagePreview(null); }} size="icon" variant="destructive" className="absolute top-2 right-2 h-7 w-7">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-amber-300 border-dashed rounded-lg cursor-pointer bg-amber-50 hover:bg-amber-100">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <UploadCloud className="w-8 h-8 mb-2 text-amber-600" />
+                        <p className="mb-2 text-sm text-amber-700"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                        <p className="text-xs text-amber-600">PNG, JPG or GIF</p>
+                      </div>
+                      <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                    </label>
+                  )}
+                </div>
+
                 <div className="space-y-2">
                   <label htmlFor="name" className="font-medium text-amber-800">Product Name</label>
                   <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Wireless Headphones" />
