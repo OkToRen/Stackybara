@@ -8,7 +8,7 @@ export default function SellerHeader() {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 flex justify-between items-center py-3">
         {/* Left Side: Logo and Branding */}
-        <Link to="/seller/dashboard" className="flex items-center gap-2">
+        <Link to="/seller" className="flex items-center gap-2">
           <img src={Logo} alt="ShoppyBara Logo" className="h-8 w-8" />
           <span className="font-bold text-xl text-amber-900">ShoppyBara</span>
           <span className="text-sm font-medium text-teal-600 border-l-2 pl-3 ml-3">
