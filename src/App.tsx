@@ -26,7 +26,7 @@ function App() {
           </Route>
 
           <Route path="/seller" element={<SellerLayout />}>
-            <Route path="dashboard" element={<DashboardPage />} />
+            <Route index element={<DashboardPage />} />
             <Route path="productmanager" element={<ProductManagerPage />} />
             <Route path="orders" element={<OrderPage />} />
             <Route path="profile" element={<StoreProfilePage />} />
