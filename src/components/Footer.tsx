@@ -13,7 +13,7 @@ export default function Footer() {
                 alt="Stackybara Logo"
                 className="w-8 h-8 rounded"
               />
-              <span className="text-xl font-bold text-white">Stackybara</span>
+              <span className="text-xl font-bold text-white">Shoppybara</span>
             </div>
             <p className="text-amber-200 mb-4">
               The future of decentralized e-commerce, powered by blockchain
@@ -134,7 +134,7 @@ export default function Footer() {
         </div>
         <div className="border-t border-amber-800 mt-8 pt-8 text-center">
           <p className="text-amber-200">
-            © 2024 Stackybara. All rights reserved. Built on blockchain
+            © 2024 Shoppybara. All rights reserved. Built on blockchain
             technology.
           </p>
         </div>

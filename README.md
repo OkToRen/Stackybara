@@ -1,6 +1,6 @@
-# 🛒 Stackybara - Decentralized Online Shopping on the Internet Computer
+# 🛒 ShoppyBara - Decentralized Online Shopping on the Internet Computer
 
-Stackybara is a modern, decentralized e-commerce platform powered by blockchain technology. Built using **Vite**, **React**, and **Motoko**, it leverages the **Internet Computer** to deliver a secure, censorship-resistant shopping experience.
+Shoppybara is a modern, decentralized e-commerce platform powered by blockchain technology. Built using **Vite**, **React**, and **Motoko**, it leverages the **Internet Computer** to deliver a secure, censorship-resistant shopping experience.
 
 > "Because capybaras deserve smooth shopping too."
 

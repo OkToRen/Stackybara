@@ -17,7 +17,7 @@ export default function Header() {
               className="w-10 h-10 rounded-lg"
             />
             <span className="text-2xl font-bold text-amber-900">
-              Stackybara
+              Shoppybara
             </span>
           </Link>
 

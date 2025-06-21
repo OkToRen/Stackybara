@@ -119,7 +119,7 @@ export default function HomePage() {
                 <span className="text-teal-600">Simplified</span>
               </h1>
               <p className="text-lg text-amber-800 leading-relaxed">
-                Experience the future of e-commerce with Stackybara. Every
+                Experience the future of e-commerce with Shoppybara. Every
                 transaction is secure, transparent, and stored on the
                 blockchain. Shop with confidence in our decentralized
                 marketplace.
@@ -161,7 +161,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-amber-900 mb-4">
-              Why Choose Stackybara?
+              Why Choose Shoppybara?
             </h2>
             <p className="text-amber-700 max-w-2xl mx-auto">
               Built on cutting-edge blockchain technology for a secure and
