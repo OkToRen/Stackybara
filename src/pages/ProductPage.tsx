@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Search, Filter, Grid, List, Star, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,10 @@ import Header from '@/components/Header';
 export default function ProductsPage() {
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('featured');
 
   const products = [
     {
@@ -106,6 +110,77 @@ export default function ProductsPage() {
     'Sports',
   ];
 
+  // Filter products based on all criteria
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      // Filter by search query
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Filter by category
+      const matchesCategory = selectedCategories.length === 0 || 
+        selectedCategories.includes(product.category) ||
+        (selectedCategories.includes('All') && categories.includes(product.category));
+
+      // Filter by price
+      const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+
+      // Filter by rating
+      const matchesRating = selectedRatings.length === 0 || 
+        selectedRatings.some(rating => product.rating >= rating);
+
+      return matchesSearch && matchesCategory && matchesPrice && matchesRating;
+    });
+  }, [products, selectedCategories, priceRange, selectedRatings, searchQuery]);
+
+  // Sort products based on sortOption
+  const sortedProducts = useMemo(() => {
+    let sorted = [...filteredProducts];
+    switch (sortOption) {
+      case 'price-low':
+        sorted.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        sorted.sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        sorted.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'newest':
+        sorted.sort((a, b) => b.id - a.id);
+        break;
+      default:
+        // 'featured' or unknown: no sorting or default order
+        break;
+    }
+    return sorted;
+  }, [filteredProducts, sortOption]);
+
+  // Handler for category selection
+  const handleCategoryChange = (category: string) => {
+    if (category === 'All') {
+      setSelectedCategories(selectedCategories.includes('All') ? [] : ['All']);
+    } else {
+      setSelectedCategories(prev => {
+        const newCategories = prev.filter(c => c !== 'All');
+        if (prev.includes(category)) {
+          return newCategories.filter(c => c !== category);
+        } else {
+          return [...newCategories, category];
+        }
+      });
+    }
+  };
+
+  // Handler for rating selection
+  const handleRatingChange = (rating: number) => {
+    setSelectedRatings(prev => 
+      prev.includes(rating) 
+        ? prev.filter(r => r !== rating)
+        : [...prev, rating]
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
@@ -134,6 +209,8 @@ export default function ProductsPage() {
                         <input
                           type="checkbox"
                           className="rounded border-amber-300"
+                          checked={selectedCategories.includes(category)}
+                          onChange={() => handleCategoryChange(category)}
                         />
                         <span className="text-amber-800">{category}</span>
                       </label>
@@ -179,6 +256,8 @@ export default function ProductsPage() {
                         <input
                           type="checkbox"
                           className="rounded border-amber-300"
+                          checked={selectedRatings.includes(rating)}
+                          onChange={() => handleRatingChange(rating)}
                         />
                         <div className="flex items-center">
                           {Array.from({ length: rating }).map((_, i) => (
@@ -206,10 +285,12 @@ export default function ProductsPage() {
                 <Input
                   placeholder="Search products..."
                   className="pl-10 border-amber-300 focus:border-teal-400"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <div className="flex gap-2">
-                <select className="w-40 border border-amber-300 rounded-md px-3 py-2">
+                <select className="w-40 border border-amber-300 rounded-md px-3 py-2" value={sortOption} onChange={e => setSortOption(e.target.value)}>
                   <option value="featured">Featured</option>
                   <option value="price-low">Price: Low to High</option>
                   <option value="price-high">Price: High to Low</option>
@@ -249,7 +330,7 @@ export default function ProductsPage() {
                   : 'space-y-4'
               }
             >
-              {products.map((product) => (
+              {sortedProducts.map((product) => (
                 <Card
                   key={product.id}
                   className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
