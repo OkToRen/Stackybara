@@ -1,6 +1,7 @@
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState, useMemo } from 'react';
+import { useProduct } from '@/lib/ProductContext';
 import { Search, Filter, Grid, List, Star, ShoppingCart, RotateCcw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function ProductsPage() {
   const location = useLocation();
+  const {product, setProduct} = useProduct();
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -557,10 +559,11 @@ export default function ProductsPage() {
               {sortedProducts.map((product) => {
                 const cartItem = cart.find((item) => item.id === product.id);
                 return (
+                  <Link to="/productdetails" onClick={() =>setProduct(product)}>
                   <Card
                     key={product.id}
                     className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
-                  >
+                    >
                     <div
                       className={
                         viewMode === 'list' ? 'w-48 flex-shrink-0' : ''
@@ -640,6 +643,7 @@ export default function ProductsPage() {
                       </CardFooter>
                     </div>
                   </Card>
+                  </Link>
                 );
               })}
             </div>
