@@ -20,7 +20,7 @@ export default function SellerHeader() {
         <div className="flex items-center gap-4">
           <nav className="flex items-center gap-4">
             <Link 
-              to="/seller/dashboard" 
+              to="/seller" 
               className="flex items-center gap-2 text-sm font-medium text-amber-800 hover:text-teal-600 transition-colors"
             >
               <LayoutDashboard className="h-4 w-4" />
