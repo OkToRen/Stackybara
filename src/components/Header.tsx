@@ -13,7 +13,7 @@ export default function Header() {
           <Link to="/" className="flex items-center space-x-3">
             <img
               src={Logo}
-              alt="Stackybara Logo"
+              alt="Shoppybara Logo"
               className="w-10 h-10 rounded-lg"
             />
             <span className="text-2xl font-bold text-amber-900">
@@ -86,7 +86,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Search */}
         <div className="md:hidden mt-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 h-4 w-4" />

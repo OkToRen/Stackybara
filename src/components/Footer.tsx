@@ -10,7 +10,7 @@ export default function Footer() {
             <div className="flex items-center space-x-3 mb-4">
               <img
                 src={Logo}
-                alt="Stackybara Logo"
+                alt="Shoppybara Logo"
                 className="w-8 h-8 rounded"
               />
               <span className="text-xl font-bold text-white">Shoppybara</span>

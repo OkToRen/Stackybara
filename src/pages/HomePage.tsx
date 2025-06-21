@@ -147,7 +147,7 @@ export default function HomePage() {
               <div className="bg-gradient-to-br from-teal-100 to-amber-100 rounded-3xl p-8 shadow-2xl">
                 <img
                   src={Logo}
-                  alt="Stackybara Mascot"
+                  alt="Shoppybara Mascot"
                   className="w-full max-w-sm mx-auto"
                 />
               </div>

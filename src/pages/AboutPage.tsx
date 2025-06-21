@@ -1,45 +1,43 @@
 import { Shield, Users, Globe, Heart } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import Newsletter from '@/components/Newsletter';
-import Footer from '@/components/Footer';
 import Logo from '@/assets/Logo.png';
+import DarrenOliverProfilePicture from '@/assets/DarrenOliver.jpeg';
+import RoonySoonProfilePicture from '@/assets/RoonySoon.jpg';
+import MartinEricksonProfilePicture from '@/assets/MartinErickson.jpg';
+import JasonProfilePicture from '@/assets/Jason.png';
+import RoderickAureliusProfilePicture from '@/assets/RoderickAurelius.png';
 
 export default function AboutPage() {
   const team = [
     {
-      name: 'Alex Chen',
+      name: 'Darren Oliver Putra Haryanto',
       role: 'CEO & Founder',
-      image:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&face',
-      bio: 'Blockchain enthusiast with 10+ years in e-commerce',
+      image: DarrenOliverProfilePicture,
+      bio: 'Blockchain enthusiast',
     },
     {
-      name: 'Sarah Johnson',
+      name: 'Roony Soon',
       role: 'CTO',
-      image:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&face',
+      image: RoonySoonProfilePicture,
       bio: 'Former Google engineer, blockchain security expert',
     },
     {
-      name: 'Mike Rodriguez',
+      name: 'Jason',
       role: 'Head of Product',
-      image:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&face',
+      image: JasonProfilePicture,
       bio: 'UX designer passionate about decentralized commerce',
     },
     {
-      name: 'Emily Wang',
+      name: 'Martin Erickson',
       role: 'Head of Marketing',
-      image:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&face',
+      image: MartinEricksonProfilePicture,
       bio: 'Digital marketing strategist and community builder',
     },
     {
-      name: 'Emily Wang',
+      name: 'Roderick Aurelius Tenggono',
       role: 'Head of Marketing',
-      image:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&face',
+      image: RoderickAureliusProfilePicture,
       bio: 'Digital marketing strategist and community builder',
     },
   ];
@@ -101,7 +99,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <Badge className="bg-teal-100 text-teal-800 px-4 py-2 text-sm font-medium mb-6">
-              🌟 About Stackybara
+              🌟 About Shoppybara
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold text-amber-900 mb-6">
               Revolutionizing E-commerce with{' '}
@@ -117,7 +115,7 @@ export default function AboutPage() {
             <div className="flex justify-center">
               <img
                 src={Logo}
-                alt="Stackybara Mascot"
+                alt="Shoppybara Mascot"
                 className="w-32 h-32 rounded-full shadow-lg"
               />
             </div>
