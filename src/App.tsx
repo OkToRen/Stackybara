@@ -15,6 +15,8 @@ import StoreProfilePage from './pages/StoreProfilePage';
 import { CartProvider } from './lib/CartContext';
 import CartPage from './pages/CartPage';
 import { ProductProvider } from './lib/ProductContext';
+import TestPage from './pages/TestPage';
+import { PrivateRoute } from './routes/PrivateRoute';
 
 function App() {
   return (
@@ -30,8 +32,12 @@ function App() {
                 <Route path="products" element={<ProductsPage />} />
                 <Route path="productdetails" element={<ProductDetailsPage />} />
                 <Route path="about" element={<AboutPage />} />
-                <Route path="profile" element={<ProfilePage />} />
                 <Route path="cart" element={<CartPage />} />
+                <Route path="test" element={<TestPage />} />
+              </Route>
+
+              <Route path='/profile' element={<PrivateRoute/>}>
+                <Route index element={<ProfilePage/>}></Route>
               </Route>
 
               <Route path="/seller" element={<SellerLayout />}>
@@ -45,7 +51,7 @@ function App() {
         </Router>
       </ProductProvider>
     </CartProvider>
-  );
+    );
 }
 
 export default App;

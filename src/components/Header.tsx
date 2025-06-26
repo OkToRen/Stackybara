@@ -1,4 +1,4 @@
-import { useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu } from 'lucide-react';
@@ -7,19 +7,25 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import Logo from '@/assets/logo.png'; // Adjust the path as necessary
 import { useCart } from '@/lib/CartContext';
+import { useAuthContext } from '@/lib/AuthContext';
 
 export default function Header() {
-
+  const auth = useAuthContext();
   const { cart } = useCart();
   const location = useLocation();
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const navigate = useNavigate();
   const isProductsRoute = location.pathname.startsWith('/products');
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
-    setSearchValue('');    
-    }, [location.pathname])
+    setSearchValue('');
+  }, [location.pathname]);
+
+  const handleLoginClick = () => {
+    console.log('login');
+    auth.login();
+  };
 
   const handleSearch = () => {
     if (searchValue.trim()) {
@@ -54,7 +60,8 @@ export default function Header() {
                   onChange={(e) => setSearchValue(e.target.value)}
                   onKeyDown={(e) => e.key == 'Enter' && handleSearch()}
                 />
-                <Button className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white px-6"
+                <Button
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white px-6"
                   onClick={handleSearch}
                 >
                   Search
@@ -82,15 +89,24 @@ export default function Header() {
                 About
               </Link>
             </nav>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-amber-800 hover:text-teal-600"
-            >
-              <Link to={'/profile'} className="flex items-center">
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
+            {auth.isAuthenticated ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-amber-800 hover:text-teal-600"
+              >
+                <Link to={'/profile'} className="flex items-center">
+                  <User className="h-5 w-5" />
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                onClick={handleLoginClick}
+                className="bg-teal-500 hover:bg-teal-600 text-white"
+              >
+                Login
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"

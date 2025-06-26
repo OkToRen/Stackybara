@@ -10,13 +10,19 @@ import {
   Shield,
   Edit3,
   Camera,
+  LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { authHooks } from '@ic-reactor/react/dist/helpers';
+import { useAuth } from '@ic-reactor/react';
+import { useAuthContext } from '@/lib/AuthContext';
+
 export default function ProfilePage() {
+  const auth = useAuthContext();
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: 'Alex Johnson',
@@ -87,6 +93,8 @@ export default function ProfilePage() {
     setIsEditing(false);
     // Here you would typically save to backend
   };
+
+  const handleLogout = () => {auth.logout()};
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -163,6 +171,7 @@ export default function ProfilePage() {
                         <Edit3 className="h-4 w-4 mr-2" />
                         {isEditing ? 'Cancel' : 'Edit Profile'}
                       </Button>
+
                       {isEditing && (
                         <Button
                           onClick={handleSave}
@@ -512,6 +521,22 @@ export default function ProfilePage() {
                     className="w-full border-amber-300 text-amber-800 hover:bg-amber-100"
                   >
                     Enable Two-Factor Authentication
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-amber-200">
+                <CardHeader>
+                  <CardTitle className="text-amber-900">Account</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full border-red-300 text-red-800 hover:bg-red-50"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
                   </Button>
                 </CardContent>
               </Card>
