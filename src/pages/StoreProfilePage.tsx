@@ -1,5 +1,3 @@
-// src/pages/seller/StoreProfilePage.tsx
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +7,6 @@ import { MapPin, Calendar, Edit, Star, Package, Save, XCircle } from 'lucide-rea
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from '@/assets/logo.png';
 
-// --- Sample Data (Re-adding bannerUrl) ---
 const initialStoreInfo = {
   name: "The Capy Store",
   tagline: "Home of the finest digital goods",
@@ -33,23 +30,20 @@ const reviews: Review[] = [
 export default function StoreProfilePage() {
   const [activeTab, setActiveTab] = useState('products');
   const [isEditing, setIsEditing] = useState(false);
-  
-  // State for the store info, which can now be updated
+
   const [storeInfo, setStoreInfo] = useState(initialStoreInfo);
-  
-  // Temporary state for form fields while editing
+
   const [formData, setFormData] = useState({
     name: storeInfo.name,
     tagline: storeInfo.tagline,
-    location: storeInfo.location, // Added location to form state
+    location: storeInfo.location, 
   });
 
   useEffect(() => {
-    // Sync form data if storeInfo changes from an external source
     setFormData({
       name: storeInfo.name,
       tagline: storeInfo.tagline,
-      location: storeInfo.location, // Sync location
+      location: storeInfo.location, 
     });
   }, [storeInfo]);
 
@@ -59,14 +53,12 @@ export default function StoreProfilePage() {
   };
 
   const handleSaveChanges = () => {
-    // In a real app, call the backend updateUser function here
     console.log("Saving changes:", formData);
     setStoreInfo(prev => ({ ...prev, ...formData }));
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    // Reset form to original data on cancel
     setFormData({
       name: storeInfo.name,
       tagline: storeInfo.tagline,
@@ -77,7 +69,6 @@ export default function StoreProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
-      {/* Banner Image Section */}
       <div
         className="h-40 bg-cover bg-center"
         style={{ backgroundImage: `url(${storeInfo.bannerUrl})` }}
@@ -86,14 +77,12 @@ export default function StoreProfilePage() {
       </div>
       
       <div className="container mx-auto px-4 sm:px-8">
-        {/* Profile Card Section */}
         <Card className="relative -mt-20 overflow-hidden border-amber-200 shadow-lg">
           <div className="h-20 bg-gradient-to-r from-teal-500 to-emerald-600" />
           
           <div className="bg-white px-6 pb-6">
             <div className="pt-12">
               {isEditing ? (
-                // EDITING VIEW
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="name" className="text-xs font-medium text-amber-700">Store Name</label>
@@ -109,7 +98,6 @@ export default function StoreProfilePage() {
                   </div>
                 </div>
               ) : (
-                // DISPLAY VIEW
                 <div className="text-center sm:text-left">
                   <h1 className="text-2xl font-bold text-amber-950">{storeInfo.name}</h1>
                   <p className="text-sm text-amber-700">{storeInfo.tagline}</p>
@@ -132,7 +120,6 @@ export default function StoreProfilePage() {
           </div>
           <div className="absolute top-4 right-4">
             {isEditing ? (
-              // SAVE / CANCEL BUTTONS
               <div className="flex gap-2">
                 <Button onClick={handleCancel} variant="ghost" size="sm" className="bg-white/90 text-red-600 hover:bg-red-50">
                   <XCircle className="h-4 w-4 mr-1"/> Cancel
@@ -142,7 +129,6 @@ export default function StoreProfilePage() {
                 </Button>
               </div>
             ) : (
-              // EDIT BUTTON
               <Button onClick={() => setIsEditing(true)} variant="outline" className="bg-white/90 hover:bg-white text-teal-700 border-teal-200 shadow">
                 <Edit className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Edit Profile</span>
@@ -150,8 +136,7 @@ export default function StoreProfilePage() {
             )}
           </div>
         </Card>
-      
-        {/* TAB NAVIGATION AND CONTENT */}
+
         <div className="mt-8">
           <div className="border-b border-amber-200">
             <nav className="flex space-x-6">

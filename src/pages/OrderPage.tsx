@@ -1,12 +1,9 @@
-// src/pages/seller/OrderPage.tsx
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { OrderCard, type Order } from '@/components/ui/ordercard';
 import { Search, Inbox } from 'lucide-react';
 
-// Sample Data: This would come from your backend canister
 const allOrders: Order[] = [
   {
     id: 'A1B2C',
@@ -62,13 +59,19 @@ type Tab = 'New' | 'Shipped' | 'Completed' | 'All';
 
 export default function OrderPage() {
   const [activeTab, setActiveTab] = useState<Tab>('New');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const tabs: Tab[] = ['New', 'Shipped', 'Completed', 'All'];
 
-  const filteredOrders = allOrders.filter(order => {
-    if (activeTab === 'All') return true;
-    return order.status === activeTab;
-  });
+  const filteredOrders = allOrders
+    .filter(order => {
+      if (activeTab === 'All') return true;
+      return order.status === activeTab;
+    })
+    .filter(order =>
+      order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.id.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 p-8">
@@ -78,7 +81,6 @@ export default function OrderPage() {
           <p className="text-lg text-amber-700">View and process your incoming customer orders.</p>
         </div>
 
-        {/* Tab Navigation */}
         <div className="border-b border-amber-200 mb-6">
           <div className="flex space-x-6">
             {tabs.map(tab => (
@@ -97,17 +99,27 @@ export default function OrderPage() {
           </div>
         </div>
 
-        {/* Order List */}
+        <div className="mb-6">
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 h-4 w-4" />
+            <Input
+              placeholder="Search by Order ID or Customer Name..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
         <div className="space-y-6">
           {filteredOrders.length > 0 ? (
             filteredOrders.map(order => <OrderCard key={order.id} order={order} />)
           ) : (
-            // Empty State View
             <div className="text-center py-16 px-6 bg-white rounded-lg border border-amber-200">
               <Inbox className="mx-auto h-12 w-12 text-amber-400" />
-              <h3 className="mt-2 text-lg font-medium text-amber-900">No orders here</h3>
+              <h3 className="mt-2 text-lg font-medium text-amber-900">No orders found</h3>
               <p className="mt-1 text-sm text-amber-700">
-                You currently have no orders in the "{activeTab}" status.
+                Your search did not match any orders in the "{activeTab}" status.
               </p>
             </div>
           )}

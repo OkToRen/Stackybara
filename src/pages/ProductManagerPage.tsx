@@ -1,50 +1,52 @@
-// src/pages/seller/ProductManagerPage.tsx
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, PlusCircle, ArrowLeft, UploadCloud, X, Inbox, Pencil, Trash2 } from "lucide-react";
 
-// Define a type for our product for better type safety
 type Product = {
   id: number;
   name: string;
   price: number;
   stock: number;
+  image: string;
 };
 
-// Sample Data: In a real app, this would come from a backend call
 const initialSellerProducts: Product[] = [
   {
     id: 1,
     name: 'Wireless Bluetooth Headphones',
     price: 89.99,
     stock: 50,
+    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Headphones'
   },
   {
     id: 2,
     name: 'Organic Cotton T-Shirt',
     price: 24.99,
     stock: 120,
+    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=T-Shirt'
   },
   {
     id: 3,
     name: 'Ergonomic Laptop Stand',
     price: 45.99,
     stock: 0,
+    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Stand'
   },
   {
     id: 4,
     name: 'Washing Machine',
     price: 499.99,
     stock: 15,
+    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Washer'
   },
   {
     id: 5,
     name: 'Windows 11 Pro Key',
     price: 129.99,
     stock: 200,
+    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Windows'
   }
 ];
 
@@ -52,16 +54,12 @@ export default function ProductManagerPage() {
   const [sellerProducts, setSellerProducts] = useState(initialSellerProducts);
   const [view, setView] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
-
-  // State for the add/edit form fields
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
-  // State to track which product is being edited or deleted
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
@@ -100,9 +98,9 @@ export default function ProductManagerPage() {
     setName(product.name);
     setPrice(product.price.toString());
     setStock(product.stock.toString());
-    setDescription(''); // Assuming description is not part of the main product object
+    setDescription('');
     setImage(null);
-    setImagePreview(null);
+    setImagePreview(product.image);
     setView('form');
   };
 
@@ -118,43 +116,39 @@ export default function ProductManagerPage() {
     }
     
     if (editingProduct) {
-      // Logic for updating an existing product
-      console.log('Updating product:', { id: editingProduct.id, name, description, price, stock });
+      console.log('Updating product:', { id: editingProduct.id, name, description, price, stock, newImage: image?.name });
       setSellerProducts(prevProducts => 
         prevProducts.map(p => 
           p.id === editingProduct.id 
-            ? { ...p, name, price: parseFloat(price), stock: parseInt(stock) } 
+            ? { ...p, name, price: parseFloat(price), stock: parseInt(stock), image: imagePreview || p.image } 
             : p
         )
       );
     } else {
-      // Logic for adding a new product
       if (!image) {
         alert('Please upload an image for the new product.');
         return;
       }
-      const newId = Math.max(...sellerProducts.map(p => p.id)) + 1;
+      const newId = Math.max(...sellerProducts.map(p => p.id), 0) + 1;
       console.log('Adding new product:', { id: newId, name, description, price, stock, imageName: image.name });
       setSellerProducts(prev => [
         ...prev, 
-        { id: newId, name, price: parseFloat(price), stock: parseInt(stock) }
+        { id: newId, name, price: parseFloat(price), stock: parseInt(stock), image: imagePreview || '' }
       ]);
     }
     handleShowListView();
   };
 
   const handleDelete = (product: Product) => {
-    // In a real app, call backend to delete, then update state on success
     console.log(`Deleting product with ID: ${product.id}`);
     setSellerProducts(prev => prev.filter(p => p.id !== product.id));
-    setDeletingProduct(null); // Close the confirmation popup
+    setDeletingProduct(null);
   };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 p-8">
       <div className="container mx-auto">
         
-        {/* VIEW 1: PRODUCT LIST */}
         {view === 'list' && (
           <div>
             <div className="mb-8">
@@ -188,7 +182,10 @@ export default function ProductManagerPage() {
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
                     <div key={product.id} className="grid grid-cols-5 gap-4 items-center p-4">
-                      <div className="col-span-2 font-medium text-amber-950">{product.name}</div>
+                      <div className="col-span-2 font-medium text-amber-950 flex items-center gap-3">
+                        <img src={product.image} alt={product.name} className="w-10 h-10 object-cover rounded-md" />
+                        <span>{product.name}</span>
+                      </div>
                       <div>${product.price.toFixed(2)}</div>
                       <div className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
                         {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
@@ -215,7 +212,6 @@ export default function ProductManagerPage() {
           </div>
         )}
 
-        {/* VIEW 2: ADD/EDIT FORM */}
         {view === 'form' && (
           <div>
             <Button onClick={handleShowListView} variant="ghost" className="mb-4 text-amber-800 hover:text-amber-950">
@@ -262,7 +258,6 @@ export default function ProductManagerPage() {
           </div>
         )}
 
-        {/* DELETE CONFIRMATION POPUP */}
         {deletingProduct && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
             <Card className="max-w-sm bg-amber-50/90 backdrop-blur-lg border-amber-200 shadow-xl">

@@ -1,5 +1,3 @@
-// src/pages/seller/DashboardPage.tsx
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/ui/statcard"; 
@@ -8,21 +6,18 @@ import { Link } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
-// Define a specific type for the filter periods for type safety
 type Period = 'Today' | 'This Month' | 'This Year';
 
 export default function DashboardPage() {
   const [revenuePeriod, setRevenuePeriod] = useState<Period>('Today');
   const [customerPeriod, setCustomerPeriod] = useState<Period>('Today');
 
-  // In a real app, this data would come from your backend canister
   const storeData = {
     name: "The Capy Store",
     ordersToProcess: 1,
     totalProducts: 5,
   };
 
-  // Explicitly type the data objects to match the Period type
   const revenueData: Record<Period, { value: string; change: string }> = {
     Today: { value: "Rp 1,350,000", change: "+10%" },
     'This Month': { value: "Rp 25,700,000", change: "+8%" },
@@ -49,7 +44,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 p-8">
       <div className="container mx-auto">
-        {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-amber-900">
             Welcome back, {storeData.name}!
@@ -59,13 +53,10 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Main Stats Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          {/* Revenue Card with Filter */}
           <Card className="border-amber-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-amber-800">Revenue</CardTitle>
-              {/* Simple select for dropdown filter */}
               <select 
                 value={revenuePeriod} 
                 onChange={(e) => setRevenuePeriod(e.target.value as Period)}
@@ -95,7 +86,6 @@ export default function DashboardPage() {
             description="Currently listed for sale"
           />
           
-          {/* Customers Card with Filter */}
            <Card className="border-amber-200">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-amber-800">Total Customers</CardTitle>
@@ -116,9 +106,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Recent Orders and Best Sellers Section */}
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Recent Orders Table */}
           <Card className="border-amber-200">
             <CardHeader>
               <CardTitle className="text-amber-900 flex items-center">
@@ -152,7 +140,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Best Sellers Table */}
           <Card className="border-amber-200">
             <CardHeader>
               <CardTitle className="text-amber-900 flex items-center">
@@ -164,6 +151,7 @@ export default function DashboardPage() {
             <div className="divide-y divide-amber-100">
                 {bestSellers.map(product => (
                   <div key={product.name} className="flex items-center gap-4 py-3">
+                    <img src={product.image} alt={product.name} className="h-10 w-10 rounded-md" />
                     <div className="flex-1">
                       <p className="font-semibold text-amber-950">{product.name}</p>
                       <p className="text-sm text-amber-700">{product.orders} orders</p>
