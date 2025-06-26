@@ -623,9 +623,11 @@ export default function ProductsPage() {
                       <CardFooter className="p-4 pt-0">
                         {cartItem ? (
                           <div className="flex items-center w-full gap-2">
-                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={() => decreaseFromCart(product.id)}>-</Button>
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={(e) => {
+                                e.preventDefault();  decreaseFromCart(product.id);}}>-</Button>
                             <span className="font-semibold text-amber-900">{cartItem.quantity}</span>
-                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image })}>+</Button>
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={(e) => {
+                                e.preventDefault(); addToCart({ id: product.id, name: product.name, price: product.price, image: product.image });}}>+</Button>
                             <Button className="flex-1 bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
                               <ShoppingCart className="h-4 w-4 mr-2" />
                               Add More
@@ -634,7 +636,10 @@ export default function ProductsPage() {
                         ) : (
                           <Button
                             className="w-full bg-teal-500 hover:bg-teal-600 text-white"
-                            onClick={() => handleAddToCart(product)}
+                             onClick={(e) => {
+                                e.preventDefault();     
+                                handleAddToCart(product);
+                              }}
                           >
                             <ShoppingCart className="h-4 w-4 mr-2" />
                             Add to Cart

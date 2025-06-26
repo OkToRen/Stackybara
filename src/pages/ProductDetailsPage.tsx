@@ -10,6 +10,9 @@ export default function ProductDetailsPage(){
     const {product} = useProduct();
     const { addToCart, cart, decreaseFromCart } = useCart();
     const [cartMessage, setCartMessage] = useState<string | null>(null);
+    const cartItem = cart.find((item) => item.id === product?.id);
+    
+
     const handleAddToCart = (product: Product) => {
     addToCart({
       id: product.id,
@@ -20,7 +23,7 @@ export default function ProductDetailsPage(){
     setCartMessage(`${product.name} added to cart!`);
     setTimeout(() => setCartMessage(null), 2000);
   };
-    return(
+    return(        
         <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
             <div className="container mx-auto px-4 py-8">
                 {product ?(
@@ -36,11 +39,24 @@ export default function ProductDetailsPage(){
                                 <p className="text-lg text-gray-700 mb-2 justify-start w-fit mt-[2vw]">${product.price}</p>
                                 <p className="text-sm text-gray-500 mb-4 justify-start w-fit">{product.description}</p>                        
                             </div>
+                            {cartItem ? (
+                          <div className="flex items-center w-full gap-2">
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={(e) => {
+                                e.preventDefault();  decreaseFromCart(product.id);}}>-</Button>
+                            <span className="font-semibold text-amber-900">{cartItem.quantity}</span>
+                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={(e) => {
+                                e.preventDefault(); addToCart({ id: product.id, name: product.name, price: product.price, image: product.image });}}>+</Button>
+                            <Button className="flex-1 bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
+                              <ShoppingCart className="h-4 w-4 mr-2" />
+                              Add More
+                            </Button>
+                          </div>
+                        ) : (
                                 <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white "
                             onClick={() => handleAddToCart(product)}
                         >
                             <ShoppingCart className="h-4 w-4 mr-2" />Add to Cart
-                        </Button>
+                        </Button>)}
                         </div>
                     </div>
                     
