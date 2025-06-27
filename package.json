@@ -24,11 +24,15 @@
     "as-table": "^1.0.55",
     "browserslist": "^4.25.0",
     "class-variance-authority": "^0.7.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.517.0",
     "radix-ui": "^1.4.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.6.2",
+    "recharts": "^3.0.2",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, PlusCircle, ArrowLeft, UploadCloud, X, Inbox, Pencil, Trash2 } from "lucide-react";
+import { Search, PlusCircle, ArrowLeft, UploadCloud, X, Inbox, Pencil, Trash2, Filter, SlidersHorizontal } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 type Product = {
   id: number;
@@ -11,6 +12,9 @@ type Product = {
   stock: number;
   image: string;
 };
+
+type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc';
+type StockFilter = 'all' | 'in-stock' | 'out-of-stock' | 'low-stock';
 
 const initialSellerProducts: Product[] = [
   {
@@ -47,6 +51,20 @@ const initialSellerProducts: Product[] = [
     price: 129.99,
     stock: 200,
     image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Windows'
+  },
+  {
+    id: 6,
+    name: 'Smartphone Case',
+    price: 15.99,
+    stock: 3,
+    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Case'
+  },
+  {
+    id: 7,
+    name: 'Gaming Mouse',
+    price: 75.50,
+    stock: 0,
+    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Mouse'
   }
 ];
 
@@ -54,6 +72,13 @@ export default function ProductManagerPage() {
   const [sellerProducts, setSellerProducts] = useState(initialSellerProducts);
   const [view, setView] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>('name-asc');
+  const [stockFilter, setStockFilter] = useState<StockFilter>('all');
+  const [priceRangeMin, setPriceRangeMin] = useState('');
+  const [priceRangeMax, setPriceRangeMax] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Form states
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -63,9 +88,89 @@ export default function ProductManagerPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
-  const filteredProducts = sellerProducts.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter and sort products
+  const getFilteredAndSortedProducts = () => {
+    let filtered = sellerProducts.filter(product => {
+      // Text search
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Stock filter
+      let matchesStock = true;
+      switch (stockFilter) {
+        case 'in-stock':
+          matchesStock = product.stock > 0;
+          break;
+        case 'out-of-stock':
+          matchesStock = product.stock === 0;
+          break;
+        case 'low-stock':
+          matchesStock = product.stock > 0 && product.stock <= 10;
+          break;
+        default:
+          matchesStock = true;
+      }
+      
+      // Price range filter
+      const minPrice = priceRangeMin ? parseFloat(priceRangeMin) : 0;
+      const maxPrice = priceRangeMax ? parseFloat(priceRangeMax) : Infinity;
+      const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+      
+      return matchesSearch && matchesStock && matchesPrice;
+    });
+
+    // Sort products
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        case 'stock-asc':
+          return a.stock - b.stock;
+        case 'stock-desc':
+          return b.stock - a.stock;
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  };
+
+  const filteredProducts = getFilteredAndSortedProducts();
+
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setSortBy('name-asc');
+    setStockFilter('all');
+    setPriceRangeMin('');
+    setPriceRangeMax('');
+  };
+
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (searchQuery) count++;
+    if (stockFilter !== 'all') count++;
+    if (priceRangeMin || priceRangeMax) count++;
+    if (sortBy !== 'name-asc') count++;
+    return count;
+  };
+
+  const getStockBadgeColor = (stock: number) => {
+    if (stock === 0) return 'bg-red-100 text-red-800 border-red-200';
+    if (stock <= 10) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    return 'bg-green-100 text-green-800 border-green-200';
+  };
+
+  const getStockText = (stock: number) => {
+    if (stock === 0) return 'Out of Stock';
+    if (stock <= 10) return `${stock} left (Low Stock)`;
+    return `${stock} in stock`;
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -155,40 +260,170 @@ export default function ProductManagerPage() {
               <h1 className="text-3xl font-bold text-amber-900">My Products</h1>
               <p className="text-lg text-amber-700">Manage, add, and update your product listings.</p>
             </div>
-            <Card className="mb-6 border-amber-200 p-4">
-              <div className="flex justify-between items-center">
-                <div className="flex-1 relative max-w-xs">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 h-4 w-4" />
-                  <Input 
-                    placeholder="Search by product name..." 
-                    className="pl-10"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+
+            {/* Search and Filter Controls */}
+            <Card className="mb-6 border-amber-200">
+              <CardContent className="p-6">
+                <div className="flex flex-col lg:flex-row gap-4">
+                  {/* Search Bar */}
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 h-4 w-4" />
+                    <Input 
+                      placeholder="Search by product name..." 
+                      className="pl-10"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Quick Sort */}
+                  <div className="flex gap-2">
+                    <select 
+                      value={sortBy} 
+                      onChange={(e) => setSortBy(e.target.value as SortOption)}
+                      className="px-3 py-2 border border-amber-300 rounded-md bg-white text-amber-900 focus:ring-2 focus:ring-teal-500"
+                    >
+                      <option value="name-asc">Name (A-Z)</option>
+                      <option value="name-desc">Name (Z-A)</option>
+                      <option value="price-asc">Price (Low to High)</option>
+                      <option value="price-desc">Price (High to Low)</option>
+                      <option value="stock-asc">Stock (Low to High)</option>
+                      <option value="stock-desc">Stock (High to Low)</option>
+                    </select>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowFilters(!showFilters)}
+                      className="border-amber-300 text-amber-800 hover:bg-amber-100 relative"
+                    >
+                      <SlidersHorizontal className="h-4 w-4 mr-2" />
+                      Filters
+                      {getActiveFiltersCount() > 0 && (
+                        <Badge className="ml-2 bg-teal-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                          {getActiveFiltersCount()}
+                        </Badge>
+                      )}
+                    </Button>
+
+                    <Button onClick={handleShowAddForm} className="bg-teal-500 hover:bg-teal-600 text-white">
+                      <PlusCircle className="h-4 w-4 mr-2" /> Add Product
+                    </Button>
+                  </div>
                 </div>
-                <Button onClick={handleShowAddForm} className="bg-teal-500 hover:bg-teal-600 text-white flex items-center gap-2">
-                  <PlusCircle className="h-4 w-4" /> Add Product
-                </Button>
-              </div>
+
+                {/* Advanced Filters */}
+                {showFilters && (
+                  <div className="mt-6 pt-6 border-t border-amber-200">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Stock Filter */}
+                      <div>
+                        <label className="block text-sm font-medium text-amber-800 mb-2">Stock Status</label>
+                        <select 
+                          value={stockFilter} 
+                          onChange={(e) => setStockFilter(e.target.value as StockFilter)}
+                          className="w-full px-3 py-2 border border-amber-300 rounded-md bg-white text-amber-900 focus:ring-2 focus:ring-teal-500"
+                        >
+                          <option value="all">All Products</option>
+                          <option value="in-stock">In Stock</option>
+                          <option value="out-of-stock">Out of Stock</option>
+                          <option value="low-stock">Low Stock (≤10)</option>
+                        </select>
+                      </div>
+
+                      {/* Price Range */}
+                      <div>
+                        <label className="block text-sm font-medium text-amber-800 mb-2">Price Range ($)</label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="number"
+                            placeholder="Min"
+                            value={priceRangeMin}
+                            onChange={(e) => setPriceRangeMin(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Input
+                            type="number"
+                            placeholder="Max"
+                            value={priceRangeMax}
+                            onChange={(e) => setPriceRangeMax(e.target.value)}
+                            className="flex-1"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Clear Filters */}
+                      <div className="flex items-end">
+                        <Button
+                          variant="outline"
+                          onClick={clearAllFilters}
+                          className="w-full border-amber-300 text-amber-800 hover:bg-amber-100"
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Clear All Filters
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
             </Card>
+
+            {/* Results Summary */}
+            <div className="mb-4 flex justify-between items-center">
+              <p className="text-amber-700">
+                Showing {filteredProducts.length} of {sellerProducts.length} products
+              </p>
+              {getActiveFiltersCount() > 0 && (
+                <div className="flex gap-2 flex-wrap">
+                  {searchQuery && (
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                      Search: "{searchQuery}"
+                      <button onClick={() => setSearchQuery('')} className="ml-1 hover:text-amber-900">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  )}
+                  {stockFilter !== 'all' && (
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                      {stockFilter === 'in-stock' ? 'In Stock' : 
+                       stockFilter === 'out-of-stock' ? 'Out of Stock' : 'Low Stock'}
+                      <button onClick={() => setStockFilter('all')} className="ml-1 hover:text-amber-900">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  )}
+                  {(priceRangeMin || priceRangeMax) && (
+                    <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                      ${priceRangeMin || '0'} - ${priceRangeMax || '∞'}
+                      <button onClick={() => { setPriceRangeMin(''); setPriceRangeMax(''); }} className="ml-1 hover:text-amber-900">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Products Table */}
             <div className="bg-white rounded-lg shadow-sm border border-amber-200">
-              <div className="grid grid-cols-5 gap-4 font-semibold text-sm text-amber-800 p-4 border-b border-amber-200">
+              <div className="grid grid-cols-6 gap-4 font-semibold text-sm text-amber-800 p-4 border-b border-amber-200">
                 <div className="col-span-2">PRODUCT</div>
                 <div>PRICE</div>
-                <div>STOCK</div>
+                <div className="col-span-2">STOCK STATUS</div>
                 <div className="text-right">ACTIONS</div>
               </div>
               <div className="divide-y divide-amber-100">
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
-                    <div key={product.id} className="grid grid-cols-5 gap-4 items-center p-4">
+                    <div key={product.id} className="grid grid-cols-6 gap-4 items-center p-4">
                       <div className="col-span-2 font-medium text-amber-950 flex items-center gap-3">
-                        <img src={product.image} alt={product.name} className="w-10 h-10 object-cover rounded-md" />
                         <span>{product.name}</span>
                       </div>
-                      <div>${product.price.toFixed(2)}</div>
-                      <div className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
-                        {product.stock > 0 ? `${product.stock} in stock` : 'Out of Stock'}
+                      <div className="font-semibold">${product.price.toFixed(2)}</div>
+                      <div className="col-span-2">
+                        <Badge className={`${getStockBadgeColor(product.stock)} border`}>
+                          {getStockText(product.stock)}
+                        </Badge>
                       </div>
                       <div className="text-right flex justify-end gap-2">
                         <Button onClick={() => handleShowEditForm(product)} variant="ghost" size="icon" className="h-8 w-8 text-amber-700 hover:text-teal-600">
@@ -204,7 +439,11 @@ export default function ProductManagerPage() {
                   <div className="text-center p-8 text-amber-700">
                     <Inbox className="mx-auto h-10 w-10 text-amber-400 mb-2" />
                     <p className="font-medium">No products found</p>
-                    <p className="text-sm">Your search for "{searchQuery}" did not match any products.</p>
+                    <p className="text-sm">
+                      {searchQuery || stockFilter !== 'all' || priceRangeMin || priceRangeMax
+                        ? 'Try adjusting your filters or search terms.'
+                        : 'Start by adding your first product.'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -244,11 +483,23 @@ export default function ProductManagerPage() {
                   )}
                 </div>
                 
-                <div className="space-y-2"><label htmlFor="name" className="font-medium text-amber-800">Product Name</label><Input id="name" value={name} onChange={(e) => setName(e.target.value)} /></div>
-                <div className="space-y-2"><label htmlFor="description" className="font-medium text-amber-800">Description</label><Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} /></div>
+                <div className="space-y-2">
+                  <label htmlFor="name" className="font-medium text-amber-800">Product Name</label>
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="description" className="font-medium text-amber-800">Description</label>
+                  <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><label htmlFor="price" className="font-medium text-amber-800">Price ($)</label><Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} /></div>
-                  <div className="space-y-2"><label htmlFor="stock" className="font-medium text-amber-800">Stock</label><Input id="stock" type="number" value={stock} onChange={(e) => setStock(e.target.value)} /></div>
+                  <div className="space-y-2">
+                    <label htmlFor="price" className="font-medium text-amber-800">Price ($)</label>
+                    <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="stock" className="font-medium text-amber-800">Stock</label>
+                    <Input id="stock" type="number" value={stock} onChange={(e) => setStock(e.target.value)} />
+                  </div>
                 </div>
                 <Button onClick={handleSubmit} className="w-full bg-teal-500 hover:bg-teal-600 text-white">
                   {editingProduct ? 'Save Changes' : 'Confirm and Add Product'}
