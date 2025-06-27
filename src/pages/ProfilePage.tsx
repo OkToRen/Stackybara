@@ -20,9 +20,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authHooks } from '@ic-reactor/react/dist/helpers';
 import { useAuth } from '@ic-reactor/react';
 import { useAuthContext } from '@/lib/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProfilePage() {
   const auth = useAuthContext();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: 'Alex Johnson',
@@ -37,7 +39,7 @@ export default function ProfilePage() {
 
   const recentOrders = [
     {
-      id: '#ORD-2024-001',
+      id: 'ORD-2024-001',
       date: '2024-01-15',
       status: 'Delivered',
       total: 89.99,
@@ -46,7 +48,7 @@ export default function ProfilePage() {
         'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop',
     },
     {
-      id: '#ORD-2024-002',
+      id: 'ORD-2024-002',
       date: '2024-01-10',
       status: 'In Transit',
       total: 199.99,
@@ -55,7 +57,7 @@ export default function ProfilePage() {
         'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&h=100&fit=crop',
     },
     {
-      id: '#ORD-2024-003',
+      id: 'ORD-2024-003',
       date: '2024-01-05',
       status: 'Delivered',
       total: 45.99,
@@ -357,6 +359,7 @@ export default function ProfilePage() {
                             variant="outline"
                             size="sm"
                             className="border-amber-300 text-amber-800"
+                            onClick={() => navigate(`/order/${order.id}`)}
                           >
                             View Details
                           </Button>
