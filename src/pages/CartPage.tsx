@@ -42,7 +42,11 @@ export default function CartPage() {
               <span className="text-lg font-semibold text-amber-900">Total:</span>
               <span className="text-xl font-bold text-teal-600">${total.toFixed(2)}</span>
             </div>
-            <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">Checkout</Button>
+            <Link to="/checkout">
+              <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">
+                Proceed to Checkout
+              </Button>
+            </Link>
           </div>
         )}
       </div>
