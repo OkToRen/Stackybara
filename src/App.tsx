@@ -32,13 +32,13 @@ function App() {
                 <Route path="products" element={<ProductsPage />} />
                 <Route path="productdetails" element={<ProductDetailsPage />} />
                 <Route path="about" element={<AboutPage />} />
-                <Route path="checkout" element={<CheckoutPage />} />
               </Route>
 
               <Route element={<PrivateRoute />}>
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/my-orders" element={<MyOrdersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/cart" element={<CartPage />} />
               </Route>
 
               <Route path="/seller" element={<SellerLayout />}>
