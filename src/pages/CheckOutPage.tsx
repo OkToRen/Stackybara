@@ -89,7 +89,7 @@ export default function CheckoutPage() {
     setTimeout(() => {
       setIsProcessing(false);
       clearCart();
-      navigate('/order-success'); 
+      navigate('/my-orders'); 
     }, 2000);
   };
 

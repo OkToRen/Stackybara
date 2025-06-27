@@ -17,6 +17,7 @@ import CartPage from './pages/CartPage';
 import { ProductProvider } from './lib/ProductContext';
 import { PrivateRoute } from './routes/PrivateRoute';
 import CheckoutPage from './pages/CheckOutPage';
+import MyOrdersPage from './pages/MyOrdersPage';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
                 <Route path="about" element={<AboutPage />} />
                 <Route path="cart" element={<CartPage />} />
                 <Route path="checkout" element={<CheckoutPage />} />
+                <Route path="/my-orders" element={<MyOrdersPage />} />
               </Route>
 
               <Route path='/profile' element={<PrivateRoute/>}>
