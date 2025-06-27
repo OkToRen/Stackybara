@@ -1,9 +1,7 @@
 import Trie "mo:base/Trie";
 import Principal "mo:base/Principal";
 import Nat32 "mo:base/Nat32";
-import Hash "mo:base/Hash";
 import Array "mo:base/Array";
-import Buffer "mo:base/Buffer";
 
 actor class Backend() {
 
@@ -17,7 +15,6 @@ actor class Backend() {
     principal : Principal;
     name : Text;
     email : Text;
-    password : Text;
     userLocation : Text;
     isSeller : Bool;
   };
@@ -74,11 +71,11 @@ actor class Backend() {
   
 
   stable var users : Trie.Trie<Principal, UserData> = Trie.empty();
-  stable var products: Trie.Trie<Nat32, Product> = Trie.empty(); // Changed from Nat to Nat32
+  stable var products: Trie.Trie<Nat32, Product> = Trie.empty();
   stable var stores: Trie.Trie<Nat32, Store> = Trie.empty();
   stable var orders: Trie.Trie<Nat32, Order> = Trie.empty();
 
-  stable var nextProductId: Nat32 = 0; // Changed from Nat to Nat32
+  stable var nextProductId: Nat32 = 0;
   stable var nextOrderId: Nat32 = 0;
 
   public shared(msg) func registerUser(data : UserData) : async Text {
@@ -94,53 +91,6 @@ actor class Backend() {
     } else {
       return "User already registered";
     }
-  };
-
-  stable var loggedInUsers : Trie.Trie<Principal, Bool> = Trie.empty();
-
-  public shared(msg) func loginUser(data : UserData) : async Text {
-    let user = msg.caller;
-    let userKey = { hash = Principal.hash(user); key = user };
-    let result = Trie.get(users, userKey, Principal.equal);
-
-    switch (result) {
-      case (null) return "User not registered";
-      case (?storedData) {
-        if (storedData.password == data.password) {
-          let (updatedLogins, _) = Trie.put(loggedInUsers, userKey, Principal.equal, true);
-          loggedInUsers := updatedLogins;
-          return "Login successful";
-        } else {
-          return "Incorrect password";
-        };
-      };
-    };
-  };
-
-  public shared(msg) func isLoggedIn() : async Bool {
-    let user = msg.caller;
-    let userKey = { hash = Principal.hash(user); key = user };
-    switch (Trie.get(loggedInUsers, userKey, Principal.equal)) {
-      case (null) return false;
-      case (?loggedIn) return loggedIn;
-    };
-  };
-
-  func _requireLogin(caller: Principal) : Bool {
-    let userKey = { hash = Principal.hash(caller); key = caller };
-    switch (Trie.get(loggedInUsers, userKey, Principal.equal)) {
-      case (?true) return true;
-      case _ return false;
-    };
-  };
-
-  public shared(msg) func logoutUser() : async Text {
-    let user = msg.caller;
-    let userKey = { hash = Principal.hash(user); key = user };
-
-    let (updatedLogins, _) = Trie.remove(loggedInUsers, userKey, Principal.equal);
-    loggedInUsers := updatedLogins;
-    return "User logged out";
   };
 
   public query func getAllUsers() : async [(Principal, UserData)] {

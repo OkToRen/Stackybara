@@ -21,7 +21,6 @@ import MyOrdersPage from './pages/MyOrdersPage';
 
 function App() {
   return (
-    
     <CartProvider>
       <ProductProvider>
         <Router>
@@ -33,13 +32,13 @@ function App() {
                 <Route path="products" element={<ProductsPage />} />
                 <Route path="productdetails" element={<ProductDetailsPage />} />
                 <Route path="about" element={<AboutPage />} />
-                <Route path="cart" element={<CartPage />} />
                 <Route path="checkout" element={<CheckoutPage />} />
-                <Route path="/my-orders" element={<MyOrdersPage />} />
               </Route>
 
-              <Route path='/profile' element={<PrivateRoute/>}>
-                <Route index element={<ProfilePage/>}></Route>
+              <Route element={<PrivateRoute />}>
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/my-orders" element={<MyOrdersPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
               </Route>
 
               <Route path="/seller" element={<SellerLayout />}>
@@ -53,7 +52,7 @@ function App() {
         </Router>
       </ProductProvider>
     </CartProvider>
-    );
+  );
 }
 
 export default App;
