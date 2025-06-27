@@ -17,7 +17,6 @@ import { useCart } from '@/lib/CartContext';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
 import { Separator } from "@/components/ui/separator";
 
 export default function ProductsPage() {
