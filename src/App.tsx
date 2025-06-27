@@ -19,6 +19,7 @@ import { PrivateRoute } from './routes/PrivateRoute';
 import CheckoutPage from './pages/CheckOutPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
+import PostUserLoginPage from './pages/PostUserLoginPage';  
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
                 <Route path="products" element={<ProductsPage />} />
                 <Route path="productdetails" element={<ProductDetailsPage />} />
                 <Route path="about" element={<AboutPage />} />
+                <Route path="/postlogin" element={<PostUserLoginPage />} />
               </Route>
 
               <Route element={<PrivateRoute />}>

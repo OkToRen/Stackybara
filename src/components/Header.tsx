@@ -26,6 +26,7 @@ export default function Header() {
   const handleLogin = () => {
     console.log('login');
     auth.login();
+    navigate('/postlogin');
   };
 
   const handleSearch = () => {
