@@ -94,7 +94,7 @@ export default function ProfilePage() {
     // Here you would typically save to backend
   };
 
-  const handleLogout = () => {auth.logout()};
+  const handleLogoutClick = () => {auth.logout()};
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -525,13 +525,13 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-amber-200">
+              {/* <Card className="border-amber-200">
                 <CardHeader>
                   <CardTitle className="text-amber-900">Account</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Button
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     variant="outline"
                     className="w-full border-red-300 text-red-800 hover:bg-red-50"
                   >
@@ -539,10 +539,16 @@ export default function ProfilePage() {
                     Logout
                   </Button>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </TabsContent>
         </Tabs>
+        <Button
+          onClick={handleLogoutClick}
+          className="w-full text-white bg-red-500 hover:bg-red-600 mt-4"
+        >
+          Logout
+        </Button>
       </div>
     </div>
   );

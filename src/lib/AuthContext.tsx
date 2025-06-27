@@ -45,20 +45,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Handle logout
   const handleLogout = async () => {
+    console.log('logout');
     logout();
     setIsAuthenticated(false);
     setPrincipal(null);
     setActor(null);
+    console.log('logout success');
   };
 
   const checkAuth = async () => {
     try {
       const authClient = await AuthClient.create();
       const isLoggedIn = await authClient.isAuthenticated();
+
+      //
+      console.log("AuthClient isAuthenticated:", isLoggedIn);
+
       if (isLoggedIn) {
         const identity = authClient.getIdentity();
         const agent = new HttpAgent({ identity });
-
+        
+        //
+        const principal = identity.getPrincipal().toText();
+        console.log("Principal from AuthClient:", principal);
+        
         if (process.env.NODE_ENV !== 'production') {
           await agent.fetchRootKey();
         }
@@ -66,6 +76,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setActor(actorInstance);
         setIsAuthenticated(true);
         setPrincipal(identity.getPrincipal().toText());
+      } else{
+        console.log("AuthClient not logged in");
       }
     } catch (error) {
       console.error('Authentication check failed:', error);
@@ -78,6 +90,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    console.log("Authenticated:", isAuthenticated);
+    console.log("Principal:", principal);
     setIsAuthenticated(authenticated);
     if (authenticated) {
       checkAuth();

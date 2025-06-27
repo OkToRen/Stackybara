@@ -17,12 +17,13 @@ export default function Header() {
   const navigate = useNavigate();
   const isProductsRoute = location.pathname.startsWith('/products');
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     setSearchValue('');
   }, [location.pathname]);
 
-  const handleLoginClick = () => {
+  const handleLogin = () => {
     console.log('login');
     auth.login();
   };
@@ -90,6 +91,7 @@ export default function Header() {
               </Link>
             </nav>
             {auth.isAuthenticated ? (
+              
               <Button
                 variant="ghost"
                 size="icon"
@@ -101,24 +103,37 @@ export default function Header() {
               </Button>
             ) : (
               <Button
-                onClick={handleLoginClick}
+                onClick={handleLogin}
                 className="bg-teal-500 hover:bg-teal-600 text-white"
               >
                 Login
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-amber-800 hover:text-teal-600 relative"
-            >
-              <Link to={'/cart'} className="flex items-center">
-                <ShoppingCart className="h-5 w-5" />
-                <Badge className="absolute -top-2 -right-2 bg-teal-500 text-white text-xs px-1.5 py-0.5">
-                  {cartCount}
-                </Badge>
-              </Link>
-            </Button>
+            {auth.isAuthenticated ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-amber-800 hover:text-teal-600 relative"
+              >
+                <Link to={'/cart'} className="flex items-center">
+                  <ShoppingCart className="h-5 w-5" />
+                  <Badge className="absolute -top-2 -right-2 bg-teal-500 text-white text-xs px-1.5 py-0.5">
+                    {cartCount}
+                  </Badge>
+                </Link>
+              </Button>
+            ) : (
+              // login pop up
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-amber-800 hover:text-teal-600 relative"
+                onClick={() => setShowLoginModal(true)}
+              >
+                  <ShoppingCart className="h-5 w-5" />
+              </Button>
+            )}
+            
             <Button
               variant="ghost"
               size="icon"
@@ -138,7 +153,7 @@ export default function Header() {
             />
           </div>
         </div>
-      </div>
+      </div>      
     </header>
   );
 }
