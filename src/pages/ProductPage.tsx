@@ -2,7 +2,16 @@ import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState, useMemo } from 'react';
 import { useProduct } from '@/lib/ProductContext';
-import { Search, Filter, Grid, List, Star, ShoppingCart, RotateCcw, X } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  Grid,
+  List,
+  Star,
+  ShoppingCart,
+  RotateCcw,
+  X,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,14 +23,20 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/lib/CartContext';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { useDebounce } from '@/hooks/UseDebounce';
 
 export default function ProductsPage() {
   const location = useLocation();
-  const {product, setProduct} = useProduct();
+  const { product, setProduct } = useProduct();
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -31,11 +46,13 @@ export default function ProductsPage() {
   const { addToCart, cart, decreaseFromCart } = useCart();
   const [cartMessage, setCartMessage] = useState<string | null>(null);
 
-  useEffect(() =>{
+  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get('query') || '';
     setSearchQuery(query);
   }, [location.search]);
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const products = [
     {
@@ -133,11 +150,16 @@ export default function ProductsPage() {
     return products.filter((product) => {
       // Filter by search query
       const matchesSearch =
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+        product.name
+          .toLowerCase()
+          .includes(debouncedSearchQuery.toLowerCase()) ||
+        product.description
+          .toLowerCase()
+          .includes(debouncedSearchQuery.toLowerCase());
 
       // Filter by category
-      const matchesCategory = selectedCategories.length === 0 ||
+      const matchesCategory =
+        selectedCategories.length === 0 ||
         selectedCategories.includes(product.category) ||
         (selectedCategories.includes('All') &&
           categories.includes(product.category));
@@ -147,12 +169,19 @@ export default function ProductsPage() {
         product.price >= priceRange[0] && product.price <= priceRange[1];
 
       // Filter by rating
-      const matchesRating = selectedRatings.length === 0 ||
-        selectedRatings.some(rating => product.rating >= rating);
+      const matchesRating =
+        selectedRatings.length === 0 ||
+        selectedRatings.some((rating) => product.rating >= rating);
 
       return matchesSearch && matchesCategory && matchesPrice && matchesRating;
     });
-  }, [products, selectedCategories, priceRange, selectedRatings, searchQuery]);
+  }, [
+    products,
+    selectedCategories,
+    priceRange,
+    selectedRatings,
+    debouncedSearchQuery,
+  ]);
 
   // Sort products based on sortOption
   const sortedProducts = useMemo(() => {
@@ -195,10 +224,10 @@ export default function ProductsPage() {
 
   // Handler for rating selection
   const handleRatingChange = (rating: number) => {
-    setSelectedRatings(prev =>
+    setSelectedRatings((prev) =>
       prev.includes(rating)
-        ? prev.filter(r => r !== rating)
-        : [...prev, rating]
+        ? prev.filter((r) => r !== rating)
+        : [...prev, rating],
     );
   };
 
@@ -215,21 +244,24 @@ export default function ProductsPage() {
   };
 
   const hasActiveFilters =
-    selectedCategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000 || selectedRatings.length > 0
+    selectedCategories.length > 0 ||
+    priceRange[0] > 0 ||
+    priceRange[1] < 1000 ||
+    selectedRatings.length > 0;
 
   const clearAllFilters = () => {
-    setSelectedCategories([])
-    setPriceRange([0, 1000])
-    setSelectedRatings([])
-  }
+    setSelectedCategories([]);
+    setPriceRange([0, 1000]);
+    setSelectedRatings([]);
+  };
 
   const removeRating = (rating: number) => {
-    setSelectedRatings((prev) => prev.filter((r) => r !== rating))
-  }
+    setSelectedRatings((prev) => prev.filter((r) => r !== rating));
+  };
 
   const removeCategory = (category: string) => {
-    setSelectedCategories((prev) => prev.filter((c) => c !== category))
-  }
+    setSelectedCategories((prev) => prev.filter((c) => c !== category));
+  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
@@ -243,7 +275,9 @@ export default function ProductsPage() {
                     <div className="p-2 rounded-lg">
                       <Filter className="h-4 w-4 text-amber-600" />
                     </div>
-                    <span className="text-lg font-semibold text-slate-800">Filters</span>
+                    <span className="text-lg font-semibold text-slate-800">
+                      Filters
+                    </span>
                   </div>
                   {hasActiveFilters && (
                     <Button
@@ -283,13 +317,19 @@ export default function ProductsPage() {
                         className="text-xs bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
                       >
                         {rating}+ stars
-                        <button onClick={() => removeRating(rating)} className="ml-1 hover:bg-yellow-300 rounded-full p-0.5">
+                        <button
+                          onClick={() => removeRating(rating)}
+                          className="ml-1 hover:bg-yellow-300 rounded-full p-0.5"
+                        >
                           <X className="h-2 w-2" />
                         </button>
                       </Badge>
                     ))}
                     {(priceRange[0] > 0 || priceRange[1] < 1000) && (
-                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-green-100 text-green-700"
+                      >
                         ${priceRange[0]} - ${priceRange[1]}
                       </Badge>
                     )}
@@ -298,14 +338,23 @@ export default function ProductsPage() {
               </CardHeader>
 
               <CardContent className="space-y-6">
-                <Accordion type="multiple" defaultValue={["categories", "price", "rating"]} className="w-full">
+                <Accordion
+                  type="multiple"
+                  defaultValue={['categories', 'price', 'rating']}
+                  className="w-full"
+                >
                   {/* Categories */}
                   <AccordionItem value="categories" className="border-none">
                     <AccordionTrigger className="hover:no-underline py-3 px-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-700">Categories</span>
+                        <span className="font-medium text-slate-700">
+                          Categories
+                        </span>
                         {selectedCategories.length > 0 && (
-                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-600 border-blue-200">
+                          <Badge
+                            variant="outline"
+                            className="text-xs bg-blue-50 text-blue-600 border-blue-200"
+                          >
                             {selectedCategories.length}
                           </Badge>
                         )}
@@ -314,11 +363,16 @@ export default function ProductsPage() {
                     <AccordionContent className="pb-4">
                       <div className="grid gap-3">
                         {categories.map((category) => (
-                          <div key={category} className="flex items-center space-x-3 group">
+                          <div
+                            key={category}
+                            className="flex items-center space-x-3 group"
+                          >
                             <Checkbox
                               id={`category-${category}`}
                               checked={selectedCategories.includes(category)}
-                              onCheckedChange={() => handleCategoryChange(category)}
+                              onCheckedChange={() =>
+                                handleCategoryChange(category)
+                              }
                               className="data-[state=checked]:bg-white-600 data-[state=checked]:border-blue-600"
                             />
                             <Label
@@ -339,9 +393,14 @@ export default function ProductsPage() {
                   <AccordionItem value="price" className="border-none">
                     <AccordionTrigger className="hover:no-underline py-3 px-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-700">Price Range</span>
+                        <span className="font-medium text-slate-700">
+                          Price Range
+                        </span>
                         {(priceRange[0] > 0 || priceRange[1] < 1000) && (
-                          <Badge variant="outline" className="text-xs bg-green-50 text-green-600 border-green-200">
+                          <Badge
+                            variant="outline"
+                            className="text-xs bg-green-50 text-green-600 border-green-200"
+                          >
                             ${priceRange[0]} - ${priceRange[1]}
                           </Badge>
                         )}
@@ -351,7 +410,10 @@ export default function ProductsPage() {
                       <div className="space-y-4">
                         <div className="flex items-center gap-3">
                           <div className="flex-1">
-                            <Label htmlFor="min-price" className="text-xs text-slate-500 mb-1 block">
+                            <Label
+                              htmlFor="min-price"
+                              className="text-xs text-slate-500 mb-1 block"
+                            >
                               Min Price
                             </Label>
                             <div className="relative">
@@ -365,7 +427,10 @@ export default function ProductsPage() {
                                 max={priceRange[1]}
                                 value={priceRange[0]}
                                 onChange={(e) => {
-                                  const val = Math.min(Number(e.target.value) || 0, priceRange[1]);
+                                  const val = Math.min(
+                                    Number(e.target.value) || 0,
+                                    priceRange[1],
+                                  );
                                   setPriceRange([val, priceRange[1]]);
                                 }}
                                 className="pl-7 text-center border-slate-300 focus:border-blue-500"
@@ -379,7 +444,10 @@ export default function ProductsPage() {
                           </div>
 
                           <div className="flex-1">
-                            <Label htmlFor="max-price" className="text-xs text-slate-500 mb-1 block">
+                            <Label
+                              htmlFor="max-price"
+                              className="text-xs text-slate-500 mb-1 block"
+                            >
                               Max Price
                             </Label>
                             <div className="relative">
@@ -393,7 +461,10 @@ export default function ProductsPage() {
                                 max="10000"
                                 value={priceRange[1]}
                                 onChange={(e) => {
-                                  const val = Math.max(Number(e.target.value) || 0, priceRange[0]);
+                                  const val = Math.max(
+                                    Number(e.target.value) || 0,
+                                    priceRange[0],
+                                  );
                                   setPriceRange([priceRange[0], val]);
                                 }}
                                 className="pl-7 text-center border-slate-300 focus:border-blue-500"
@@ -448,9 +519,14 @@ export default function ProductsPage() {
                   <AccordionItem value="rating" className="border-none">
                     <AccordionTrigger className="hover:no-underline py-3 px-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-700">Rating</span>
+                        <span className="font-medium text-slate-700">
+                          Rating
+                        </span>
                         {selectedRatings.length > 0 && (
-                          <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-600 border-yellow-200">
+                          <Badge
+                            variant="outline"
+                            className="text-xs bg-yellow-50 text-yellow-600 border-yellow-200"
+                          >
                             {selectedRatings.length}
                           </Badge>
                         )}
@@ -459,7 +535,10 @@ export default function ProductsPage() {
                     <AccordionContent className="pb-4">
                       <div className="grid gap-3">
                         {[5, 4, 3, 2, 1].map((rating) => (
-                          <div key={rating} className="flex items-center space-x-3 group">
+                          <div
+                            key={rating}
+                            className="flex items-center space-x-3 group"
+                          >
                             <Checkbox
                               id={`rating-${rating}`}
                               checked={selectedRatings.includes(rating)}
@@ -472,12 +551,22 @@ export default function ProductsPage() {
                             >
                               <div className="flex items-center gap-1">
                                 {Array.from({ length: rating }).map((_, i) => (
-                                  <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                                  <Star
+                                    key={i}
+                                    className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400"
+                                  />
                                 ))}
-                                {Array.from({ length: 5 - rating }).map((_, i) => (
-                                  <Star key={i + rating} className="h-3.5 w-3.5 text-slate-300" />
-                                ))}
-                                <span className="text-sm font-medium text-slate-600 ml-2">{rating} & up</span>
+                                {Array.from({ length: 5 - rating }).map(
+                                  (_, i) => (
+                                    <Star
+                                      key={i + rating}
+                                      className="h-3.5 w-3.5 text-slate-300"
+                                    />
+                                  ),
+                                )}
+                                <span className="text-sm font-medium text-slate-600 ml-2">
+                                  {rating} & up
+                                </span>
                               </div>
                             </Label>
                           </div>
@@ -558,95 +647,126 @@ export default function ProductsPage() {
               {sortedProducts.map((product) => {
                 const cartItem = cart.find((item) => item.id === product.id);
                 return (
-                  <Link to="/productdetails" onClick={() =>setProduct(product)}>
-                  <Card
-                    key={product.id}
-                    className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
+                  <Link
+                    to="/productdetails"
+                    onClick={() => setProduct(product)}
+                  >
+                    <Card
+                      key={product.id}
+                      className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
                     >
-                    <div
-                      className={
-                        viewMode === 'list' ? 'w-48 flex-shrink-0' : ''
-                      }
-                    >
-                      <CardHeader className="p-0">
-                        <div className="relative">
-                          <img
-                            src={product.image || '/placeholder.svg'}
-                            alt={product.name}
-                            className={`object-cover ${viewMode === 'list' ? 'w-full h-32 rounded-l-lg' : 'w-full h-48 rounded-t-lg'}`}
-                          />
-                          <Badge className="absolute top-2 left-2 bg-teal-500 text-white text-xs">
-                            {product.badge}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                    </div>
-                    <div className="flex-1">
-                      <CardContent className="p-4">
-                        <h3 className="font-semibold text-amber-900 mb-2 group-hover:text-teal-600 transition-colors">
-                          {product.name}
-                        </h3>
-                        {viewMode === 'list' && (
-                          <p className="text-sm text-amber-700 mb-2">
-                            {product.description}
-                          </p>
-                        )}
-                        <div className="flex items-center mb-2">
-                          <div className="flex items-center">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm text-amber-700 ml-1">
-                              {product.rating}
-                            </span>
-                            <span className="text-sm text-amber-600 ml-1">
-                              ({product.reviews})
-                            </span>
+                      <div
+                        className={
+                          viewMode === 'list' ? 'w-48 flex-shrink-0' : ''
+                        }
+                      >
+                        <CardHeader className="p-0">
+                          <div className="relative">
+                            <img
+                              src={product.image || '/placeholder.svg'}
+                              alt={product.name}
+                              className={`object-cover ${viewMode === 'list' ? 'w-full h-32 rounded-l-lg' : 'w-full h-48 rounded-t-lg'}`}
+                            />
+                            <Badge className="absolute top-2 left-2 bg-teal-500 text-white text-xs">
+                              {product.badge}
+                            </Badge>
                           </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg font-bold text-amber-900">
-                              ${product.price}
-                            </span>
-                            <span className="text-sm text-amber-600 line-through">
-                              ${product.originalPrice}
-                            </span>
+                        </CardHeader>
+                      </div>
+                      <div className="flex-1">
+                        <CardContent className="p-4">
+                          <h3 className="font-semibold text-amber-900 mb-2 group-hover:text-teal-600 transition-colors">
+                            {product.name}
+                          </h3>
+                          {viewMode === 'list' && (
+                            <p className="text-sm text-amber-700 mb-2">
+                              {product.description}
+                            </p>
+                          )}
+                          <div className="flex items-center mb-2">
+                            <div className="flex items-center">
+                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              <span className="text-sm text-amber-700 ml-1">
+                                {product.rating}
+                              </span>
+                              <span className="text-sm text-amber-600 ml-1">
+                                ({product.reviews})
+                              </span>
+                            </div>
                           </div>
-                          <Badge
-                            variant="outline"
-                            className="border-amber-300 text-amber-700"
-                          >
-                            {product.category}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                      <CardFooter className="p-4 pt-0">
-                        {cartItem ? (
-                          <div className="flex items-center w-full gap-2">
-                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={(e) => {
-                                e.preventDefault();  decreaseFromCart(product.id);}}>-</Button>
-                            <span className="font-semibold text-amber-900">{cartItem.quantity}</span>
-                            <Button size="sm" variant="outline" className="h-8 w-8 p-0 hover:bg-amber-100" onClick={(e) => {
-                                e.preventDefault(); addToCart({ id: product.id, name: product.name, price: product.price, image: product.image });}}>+</Button>
-                            <Button className="flex-1 bg-teal-500 hover:bg-teal-600 text-white" onClick={() => handleAddToCart(product)}>
-                              <ShoppingCart className="h-4 w-4 mr-2" />
-                              Add More
-                            </Button>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-lg font-bold text-amber-900">
+                                ${product.price}
+                              </span>
+                              <span className="text-sm text-amber-600 line-through">
+                                ${product.originalPrice}
+                              </span>
+                            </div>
+                            <Badge
+                              variant="outline"
+                              className="border-amber-300 text-amber-700"
+                            >
+                              {product.category}
+                            </Badge>
                           </div>
-                        ) : (
-                          <Button
-                            className="w-full bg-teal-500 hover:bg-teal-600 text-white"
-                             onClick={(e) => {
-                                e.preventDefault();     
+                        </CardContent>
+                        <CardFooter className="p-4 pt-0">
+                          {cartItem ? (
+                            <div className="flex items-center w-full gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 hover:bg-amber-100"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  decreaseFromCart(product.id);
+                                }}
+                              >
+                                -
+                              </Button>
+                              <span className="font-semibold text-amber-900">
+                                {cartItem.quantity}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 hover:bg-amber-100"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  addToCart({
+                                    id: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    image: product.image,
+                                  });
+                                }}
+                              >
+                                +
+                              </Button>
+                              <Button
+                                className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
+                                onClick={() => handleAddToCart(product)}
+                              >
+                                <ShoppingCart className="h-4 w-4 mr-2" />
+                                Add More
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                              onClick={(e) => {
+                                e.preventDefault();
                                 handleAddToCart(product);
                               }}
-                          >
-                            <ShoppingCart className="h-4 w-4 mr-2" />
-                            Add to Cart
-                          </Button>
-                        )}
-                      </CardFooter>
-                    </div>
-                  </Card>
+                            >
+                              <ShoppingCart className="h-4 w-4 mr-2" />
+                              Add to Cart
+                            </Button>
+                          )}
+                        </CardFooter>
+                      </div>
+                    </Card>
                   </Link>
                 );
               })}
