@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/lib/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,9 @@ import {
   MessageSquare,
   Tag,
   ArrowLeft,
-  ShoppingBag
+  ShoppingBag,
+  CheckCircle,
+  X
 } from 'lucide-react';
 
 export default function CheckoutPage() {
@@ -33,6 +35,8 @@ export default function CheckoutPage() {
   const [appliedPromo, setAppliedPromo] = useState<{code: string; discount: number} | null>(null);
   const [buyerNotes, setBuyerNotes] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [countdown, setCountdown] = useState(2.5);
 
   const [address, setAddress] = useState({
     name: 'John Doe',
@@ -63,6 +67,23 @@ export default function CheckoutPage() {
     { id: 'bank', name: 'Bank Transfer', icon: Wallet, description: 'Direct bank transfer' }
   ];
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (showSuccessModal && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 0.1) {
+            clearCart();
+            navigate('/my-orders');
+            return 0;
+          }
+          return prev - 0.1;
+        });
+      }, 100);
+    }
+    return () => clearInterval(interval);
+  }, [showSuccessModal, countdown, clearCart, navigate]);
+
   const handleApplyPromo = () => {
     const promoCodes = {
       'SAVE10': { discount: 10, type: 'fixed' },
@@ -88,12 +109,18 @@ export default function CheckoutPage() {
     
     setTimeout(() => {
       setIsProcessing(false);
-      clearCart();
-      navigate('/my-orders'); 
-    }, 2000);
+      setShowSuccessModal(true);
+      setCountdown(8);
+    }, 5000);
   };
 
-  if (cart.length === 0) {
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    clearCart();
+    navigate('/my-orders');
+  };
+
+  if (cart.length === 0 && !showSuccessModal) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
         <div className="container mx-auto px-4 py-8">
@@ -440,6 +467,54 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
+            <div className="mb-6">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-12 w-12 text-green-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-green-700 mb-2">Payment Successful!</h2>
+              <p className="text-gray-600 mb-4">
+                Your order has been placed successfully. You will receive a confirmation email shortly.
+              </p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div className="text-sm text-green-800">
+                  <div className="font-semibold">Order Total: ${total.toFixed(2)}</div>
+                  <div>Payment Method: {paymentMethods.find(p => p.id === selectedPayment)?.name}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mb-6">
+              <div className="text-sm text-gray-500 mb-2">
+                Redirecting to My Orders in
+              </div>
+              <div className="text-2xl font-bold text-teal-600">
+                {countdown.toFixed(1)}s
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button 
+                onClick={handleCloseModal}
+                className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
+              >
+                Go to My Orders Now
+              </Button>
+              <Button 
+                onClick={handleCloseModal}
+                variant="outline"
+                className="px-4"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
