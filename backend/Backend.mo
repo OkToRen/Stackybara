@@ -5,6 +5,7 @@ import Array "mo:base/Array";
 import Iter "mo:base/Iter";
 import Int "mo:base/Int";
 import Nat "mo:base/Nat";
+import Debug "mo:base/Debug";
 
 actor class Backend() {
 
@@ -140,9 +141,10 @@ actor class Backend() {
   //   return Trie.get(stores, profileKey, Nat32.equal);
   // };
 
-  shared(msg) func getUser() : async Text {
-    let callerPrincipal = Principal.toText(msg.caller);
-    return "User is " # callerPrincipal;
+  public shared(msg) func getUser() : async ?UserData {
+    let key = { hash = Principal.hash(msg.caller); key = msg.caller};
+    Debug.print("returning user");
+    return Trie.get(users, key, Principal.equal);
   };
 
   public query func getUserByPrincipal(principal : Principal) : async ?UserData {
