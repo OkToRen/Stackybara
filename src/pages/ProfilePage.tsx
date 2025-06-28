@@ -35,27 +35,27 @@ export default function ProfilePage() {
 
   const getUser = useCallback(() => {
     return loading.withLoading(async () => {
-      const response = await backend.getUser();
+      console.log(auth.principal);
+      const response = await backend.getUser(auth.principal);
       console.log(response);
       setUserInfo(Array.isArray(response) ? response[0] : undefined);
     });
   }, [loading]);
 
-  const registerUser = async () => {
-    console.log('registering user');
-    const response = await backend.registerUser(
-      'darren',
-      'darrenharyanto@gmail.com',
-      'Jakarta',
-      '08111777566',
-      false,
-    );
-    console.log(response);
-    console.log('registering user finished');
-  };
+  // const registerUser = async () => {
+  //   console.log('registering user');
+  //   const response = await backend.registerUser(
+  //     'darren',
+  //     'darrenharyanto@gmail.com',
+  //     'Jakarta',
+  //     '08111777566',
+  //     false,
+  //   );
+  //   console.log(response);
+  //   console.log('registering user finished');
+  // };
 
   useEffect(() => {
-    registerUser();
     getUser();
   }, []);
 
@@ -117,7 +117,7 @@ export default function ProfilePage() {
     setIsEditing(false);
 
     if (userInfo) {
-      await backend.updateUser(userInfo);
+      await backend.updateUser(auth.principal, userInfo);
     }
   };
 
@@ -195,11 +195,11 @@ export default function ProfilePage() {
                           Member since{' '}
                           {userInfo?.createdAt
                             ? new Date(
-                                Number(userInfo.createdAt) / 1_000_000,
-                              ).toLocaleString('default', {
-                                month: 'long',
-                                year: 'numeric',
-                              })
+                              Number(userInfo.createdAt) / 1_000_000,
+                            ).toLocaleString('default', {
+                              month: 'long',
+                              year: 'numeric',
+                            })
                             : ''}
                         </span>
                       </div>
