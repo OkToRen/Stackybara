@@ -42,18 +42,18 @@ export default function ProfilePage() {
     });
   }, [loading]);
 
-  // const registerUser = async () => {
-  //   console.log('registering user');
-  //   const response = await backend.registerUser(
-  //     'darren',
-  //     'darrenharyanto@gmail.com',
-  //     'Jakarta',
-  //     '08111777566',
-  //     false,
-  //   );
-  //   console.log(response);
-  //   console.log('registering user finished');
-  // };
+  const registerUser = async () => {
+    console.log('registering user');
+    const response = await backend.registerUser(
+      auth.principal,
+      'darren',
+      'darrenharyanto@gmail.com',
+      'Jakarta',
+      '08111777566',
+    );
+    console.log(response);
+    console.log('registering user finished');
+  };
 
   useEffect(() => {
     getUser();
@@ -195,11 +195,11 @@ export default function ProfilePage() {
                           Member since{' '}
                           {userInfo?.createdAt
                             ? new Date(
-                              Number(userInfo.createdAt) / 1_000_000,
-                            ).toLocaleString('default', {
-                              month: 'long',
-                              year: 'numeric',
-                            })
+                                Number(userInfo.createdAt) / 1_000_000,
+                              ).toLocaleString('default', {
+                                month: 'long',
+                                year: 'numeric',
+                              })
                             : ''}
                         </span>
                       </div>
