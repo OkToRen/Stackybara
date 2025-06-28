@@ -42,17 +42,31 @@ export default function ProfilePage() {
     });
   }, [loading]);
 
-  const registerUser = async () => {
-    console.log('registering user');
-    const response = await backend.registerUser(
-      auth.principal,
-      'darren',
-      'darrenharyanto@gmail.com',
-      'Jakarta',
-      '08111777566',
-    );
-    console.log(response);
-    console.log('registering user finished');
+  // const registerUser = async () => {
+  //   console.log('registering user');
+  //   const response = await backend.registerUser(
+  //     'darren',
+  //     'darrenharyanto@gmail.com',
+  //     'Jakarta',
+  //     '08111777566',
+  //     false,
+  //   );
+  //   console.log(response);
+  //   console.log('registering user finished');
+  // };
+
+    const handleBecomeSeller = async () => {
+    if (userInfo) {
+      const updatedUserData = { ...userInfo, isSeller: true }; 
+      await loading.withLoading(async () => {
+        await backend.updateUser(auth.principal, updatedUserData);
+        setUserInfo(updatedUserData);
+        console.log('User updated to seller:', updatedUserData);
+        navigate('/seller/profile');
+      });
+    } else {
+      console.warn('No user info available to update.');
+    }
   };
 
   useEffect(() => {
@@ -195,11 +209,11 @@ export default function ProfilePage() {
                           Member since{' '}
                           {userInfo?.createdAt
                             ? new Date(
-                                Number(userInfo.createdAt) / 1_000_000,
-                              ).toLocaleString('default', {
-                                month: 'long',
-                                year: 'numeric',
-                              })
+                              Number(userInfo.createdAt) / 1_000_000,
+                            ).toLocaleString('default', {
+                              month: 'long',
+                              year: 'numeric',
+                            })
                             : ''}
                         </span>
                       </div>
@@ -584,6 +598,20 @@ export default function ProfilePage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              <Card className="border-amber-200">
+              <CardHeader>
+                <CardTitle className="text-amber-900">Change to Seller</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                  onClick={handleBecomeSeller}
+                >
+                  Become a Seller
+                </Button>
+              </CardContent>
+            </Card>
 
               {/* <Card className="border-amber-200">
                 <CardHeader>
