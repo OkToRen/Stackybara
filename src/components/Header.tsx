@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Logo from '@/assets/logo.png'; // Adjust the path as necessary
 import { useCart } from '@/lib/CartContext';
 import { useAuthContext } from '@/lib/AuthContext';
+import FloatingChatButton from './ui/floatingchatbutton';
 
 export default function Header() {
   const auth = useAuthContext();
@@ -92,7 +93,6 @@ export default function Header() {
               </Link>
             </nav>
             {auth.isAuthenticated ? (
-              
               <Button
                 variant="ghost"
                 size="icon"
@@ -115,7 +115,7 @@ export default function Header() {
                 variant="ghost"
                 size="icon"
                 className="text-amber-800 hover:text-teal-600 relative"
-              > 
+              >
                 <Link to={'/cart'} className="flex items-center">
                   <ShoppingCart className="h-5 w-5" />
                   <Badge className="absolute -top-2 -right-2 bg-teal-500 text-white text-xs px-1.5 py-0.5">
@@ -124,7 +124,7 @@ export default function Header() {
                 </Link>
               </Button>
             )}
-            
+
             <Button
               variant="ghost"
               size="icon"
@@ -144,7 +144,7 @@ export default function Header() {
             />
           </div>
         </div>
-      </div>      
+      </div>
     </header>
   );
 }
