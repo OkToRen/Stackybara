@@ -18,24 +18,29 @@ const TypewriterText = ({
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    if (!text) return;
+    let timeout: NodeJS.Timeout;
+    let cancelled = false;
 
-    setDisplayedText('');
-    setIsComplete(false);
-    let index = 0;
+    const type = (index: number) => {
+      if (cancelled) return;
 
-    const timer = setInterval(() => {
       if (index < text.length) {
-        setDisplayedText((prev) => prev + text[index]);
-        index++;
+        setDisplayedText(text.slice(0, index + 1));
+        timeout = setTimeout(() => type(index + 1), speed);
       } else {
         setIsComplete(true);
         onComplete();
-        clearInterval(timer);
       }
-    }, speed);
+    };
 
-    return () => clearInterval(timer);
+    setDisplayedText('');
+    setIsComplete(false);
+    type(0);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
   }, [text, speed, onComplete]);
 
   return (
@@ -306,7 +311,7 @@ export default function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
     <div className="fixed inset-0 z-50 flex items-end justify-end p-4 pointer-events-none">
       <div
         className={`bg-white rounded-2xl shadow-2xl border border-amber-200 pointer-events-auto transition-all duration-300 ${
-          isMinimized ? 'w-80 h-16' : 'w-96 h-[600px] max-h-[80vh]'
+          isMinimized ? 'w-80 h-16' : 'w-96 h-[600px] max-h-[80vh] bottom-10'
         }`}
       >
         {/* Header */}
