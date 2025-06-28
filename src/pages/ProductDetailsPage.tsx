@@ -5,7 +5,7 @@ import { Product, useProduct } from '@/lib/ProductContext';
 import { useCart } from '@/lib/CartContext';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
-
+import ScrollToTop from '@/hooks/UseScrollToTop';
 // Move products array here for recommendations
 const products = [
   {
@@ -224,6 +224,7 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
+
       <div className="container mx-auto px-4 py-8">
         {product ? (
           <div className="bg-white rounded-lg p-8 shadow flex flex-col gap-8">
@@ -318,6 +319,7 @@ export default function ProductDetailsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {filteredRecommendations.map((rec) => (
                   <div key={rec.id} className="bg-white rounded-lg shadow p-4 flex flex-col items-center cursor-pointer" onClick={() => handleRecommendationClick(rec)}>
+                    <ScrollToTop />
                     <div className="relative w-full flex justify-center">
                       <img src={rec.image} alt={rec.name} className="w-32 h-32 object-contain rounded mb-2" />
                       <span className="absolute top-2 left-2 bg-purple-600 text-xs text-white px-2 py-1 rounded font-bold">{rec.badge}</span>
@@ -353,6 +355,7 @@ export default function ProductDetailsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {youMightAlsoLike.map((rec) => (
                   <div key={rec.id} className="bg-white rounded-lg shadow p-4 flex flex-col items-center cursor-pointer" onClick={() => handleRecommendationClick(rec)}>
+                    <ScrollToTop />
                     <div className="relative w-full flex justify-center">
                       <img src={rec.image} alt={rec.name} className="w-32 h-32 object-contain rounded mb-2" />
                       <span className="absolute top-2 left-2 bg-purple-600 text-xs text-white px-2 py-1 rounded font-bold">{rec.badge}</span>

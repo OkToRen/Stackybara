@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useState, useMemo } from 'react';
 import { useProduct } from '@/lib/ProductContext';
@@ -33,6 +33,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useDebounce } from '@/hooks/UseDebounce';
+import { useAuthContext } from '@/lib/AuthContext';
 
 export default function ProductsPage() {
   const location = useLocation();
@@ -45,6 +46,8 @@ export default function ProductsPage() {
   const [sortOption, setSortOption] = useState('featured');
   const { addToCart, cart, decreaseFromCart } = useCart();
   const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const auth = useAuthContext();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -53,6 +56,12 @@ export default function ProductsPage() {
   }, [location.search]);
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  const handleLogin = () => {
+    console.log('login');
+    auth.login();
+    navigate('/postlogin');
+  };
 
   const products = [
     {
@@ -233,14 +242,19 @@ export default function ProductsPage() {
 
   // Add to cart handler
   const handleAddToCart = (product: (typeof products)[0]) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-    });
-    setCartMessage(`${product.name} added to cart!`);
-    setTimeout(() => setCartMessage(null), 2000);
+    if (auth.isAuthenticated) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      });
+      setCartMessage(`${product.name} added to cart!`);
+      setTimeout(() => setCartMessage(null), 2000);
+    }
+    else {
+      handleLogin();
+    }
   };
 
   const hasActiveFilters =

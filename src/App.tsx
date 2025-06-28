@@ -22,12 +22,14 @@ import OrderDetailPage from './pages/OrderDetailPage';
 import PostUserLoginPage from './pages/PostUserLoginPage';
 import LoadingScreen from './pages/LoadingScreen';
 import ChatPage from './pages/ChatPage';
+import ScrollToTop from './hooks/UseScrollToTop';
 
 function App() {
   return (
     <CartProvider>
       <ProductProvider>
         <Router>
+          <ScrollToTop />
           <div className="App">
             <Routes>
               <Route path="/" element={<Layout />}>

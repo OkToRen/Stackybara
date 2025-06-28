@@ -28,7 +28,8 @@
 //     </div>
 //   );
 // }
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Star,
   ArrowRight,
@@ -49,52 +50,92 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/Header';
 import Logo from '../assets/Logo.png';
+import { Product, useProduct } from '@/lib/ProductContext';
+import { useCart } from '@/lib/CartContext';
+import { useAuthContext } from '@/lib/AuthContext';
 
 export default function HomePage() {
+  const { product, setProduct } = useProduct();
+  const navigate = useNavigate();
+  const { addToCart, cart, decreaseFromCart } = useCart();
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState('grid');
+  const auth = useAuthContext();
+
+  const handleLogin = () => {
+    console.log('login');
+    auth.login();
+    navigate('/postlogin');
+  };
+
+  const handleAddToCart = (product: (typeof featuredProducts)[0]) => {
+    if (auth.isAuthenticated) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      });
+      setCartMessage(`${product.name} added to cart!`);
+      setTimeout(() => setCartMessage(null), 2000);
+    }
+    else {
+      handleLogin();
+    }
+  };
   const featuredProducts = [
     {
       id: 1,
-      name: 'Wireless Headphones',
+      name: 'Wireless Bluetooth Headphones',
       price: 89.99,
       originalPrice: 129.99,
       rating: 4.8,
       reviews: 324,
       image:
         'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop',
+      category: 'Electronics',
       badge: 'Best Seller',
+      description:
+        'Premium quality wireless headphones with noise cancellation',
     },
     {
       id: 2,
-      name: 'Smart Watch',
+      name: 'Smart Fitness Watch',
       price: 199.99,
       originalPrice: 249.99,
       rating: 4.6,
       reviews: 156,
       image:
         'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
+      category: 'Electronics',
       badge: 'New',
+      description: 'Track your fitness goals with this advanced smartwatch',
     },
     {
       id: 3,
-      name: 'Laptop Stand',
+      name: 'Ergonomic Laptop Stand',
       price: 45.99,
       originalPrice: 59.99,
       rating: 4.9,
       reviews: 89,
       image:
         'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop',
+      category: 'Office',
       badge: 'Sale',
+      description: 'Adjustable aluminum laptop stand for better posture',
     },
     {
       id: 4,
-      name: 'Bluetooth Speaker',
+      name: 'Portable Bluetooth Speaker',
       price: 79.99,
       originalPrice: 99.99,
       rating: 4.7,
       reviews: 203,
       image:
         'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=200&h=200&fit=crop',
+      category: 'Electronics',
       badge: 'Popular',
+      description: 'Waterproof speaker with 12-hour battery life',
     },
   ];
 
@@ -260,56 +301,141 @@ export default function HomePage() {
               </Button>
             </Link>
           </div>
+
+          {/* Cart Message */}
+          {cartMessage && (
+            <div className="fixed top-4 right-4 bg-teal-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-fade-in">
+              {cartMessage}
+            </div>
+          )}
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <Card
-                key={product.id}
-                className="border-amber-200 hover:shadow-lg transition-shadow group"
-              >
-                <CardHeader className="p-0">
-                  <div className="relative">
-                    <img
-                      src={product.image || '/placeholder.svg'}
-                      alt={product.name}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <Badge className="absolute top-2 left-2 bg-teal-500 text-white">
-                      {product.badge}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-amber-900 mb-2 group-hover:text-teal-600 transition-colors">
-                    {product.name}
-                  </h3>
-                  <div className="flex items-center mb-2">
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm text-amber-700 ml-1">
-                        {product.rating}
-                      </span>
-                      <span className="text-sm text-amber-600 ml-1">
-                        ({product.reviews})
-                      </span>
+            {featuredProducts.map((product) => {
+              const cartItem = cart.find((item) => item.id === product.id);
+              return (
+                <Link
+                  to="/productdetails"
+                  onClick={() => setProduct(product)}
+                >
+                  <Card
+                    key={product.id}
+                    className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
+                  >
+                    <div
+                      className={
+                        viewMode === 'list' ? 'w-48 flex-shrink-0' : ''
+                      }
+                    >
+                      <CardHeader className="p-0">
+                        <div className="relative">
+                          <img
+                            src={product.image || '/placeholder.svg'}
+                            alt={product.name}
+                            className={`object-cover ${viewMode === 'list' ? 'w-full h-32 rounded-l-lg' : 'w-full h-48 rounded-t-lg'}`}
+                          />
+                          <Badge className="absolute top-2 left-2 bg-teal-500 text-white text-xs">
+                            {product.badge}
+                          </Badge>
+                        </div>
+                      </CardHeader>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold text-amber-900">
-                      ${product.price}
-                    </span>
-                    <span className="text-sm text-amber-600 line-through">
-                      ${product.originalPrice}
-                    </span>
-                  </div>
-                </CardContent>
-                <CardFooter className="p-4 pt-0">
-                  <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    Add to Cart
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+                    <div className="flex-1">
+                      <CardContent className="p-4">
+                        <h3 className="font-semibold text-amber-900 mb-2 group-hover:text-teal-600 transition-colors">
+                          {product.name}
+                        </h3>
+                        {viewMode === 'list' && (
+                          <p className="text-sm text-amber-700 mb-2">
+                            {product.description}
+                          </p>
+                        )}
+                        <div className="flex items-center mb-2">
+                          <div className="flex items-center">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="text-sm text-amber-700 ml-1">
+                              {product.rating}
+                            </span>
+                            <span className="text-sm text-amber-600 ml-1">
+                              ({product.reviews})
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-lg font-bold text-amber-900">
+                              ${product.price}
+                            </span>
+                            <span className="text-sm text-amber-600 line-through">
+                              ${product.originalPrice}
+                            </span>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="border-amber-300 text-amber-700"
+                          >
+                            {product.category}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="p-4 pt-0">
+                        {cartItem ? (
+                          <div className="flex items-center w-full gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 w-8 p-0 hover:bg-amber-100"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                decreaseFromCart(product.id);
+                              }}
+                            >
+                              -
+                            </Button>
+                            <span className="font-semibold text-amber-900">
+                              {cartItem.quantity}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 w-8 p-0 hover:bg-amber-100"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                addToCart({
+                                  id: product.id,
+                                  name: product.name,
+                                  price: product.price,
+                                  image: product.image,
+                                });
+                              }}
+                            >
+                              +
+                            </Button>
+                            <Button
+                              className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
+                              onClick={() => handleAddToCart(product)}
+                            >
+                              <ShoppingCart className="h-4 w-4 mr-2" />
+                              Add More
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button
+                            className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleAddToCart(product);
+                            }}
+                          >
+                            <ShoppingCart className="h-4 w-4 mr-2" />
+                            Add to Cart
+                          </Button>
+                        )}
+                      </CardFooter>
+                    </div>
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

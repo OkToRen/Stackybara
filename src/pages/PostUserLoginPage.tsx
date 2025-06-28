@@ -21,7 +21,7 @@ export default function PostUserLoginPage() {
     const response = backend.registerUser(
       auth.principal, name, email, phone, address
     );
-    console.log(auth.principal, name, email, phone, address);
+    console.log(Array.isArray(response) ? response[0] : undefined);
     console.log('registering user finished');
     navigate('/profile');
   };
