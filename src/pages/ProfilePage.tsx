@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   User,
   Settings,
@@ -21,6 +21,7 @@ import { authHooks } from '@ic-reactor/react/dist/helpers';
 import { useAuth } from '@ic-reactor/react';
 import { useAuthContext } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { backend } from '@/declarations/backend';
 
 export default function ProfilePage() {
   const auth = useAuthContext();
@@ -36,6 +37,15 @@ export default function ProfilePage() {
     totalSpent: 1847.5,
     membershipLevel: 'Gold',
   });
+
+  const getUser = () => {
+    const response = backend.getUser();
+    console.log(response);
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   const recentOrders = [
     {
@@ -96,7 +106,9 @@ export default function ProfilePage() {
     // Here you would typically save to backend
   };
 
-  const handleLogoutClick = () => {auth.logout()};
+  const handleLogoutClick = () => {
+    auth.logout();
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {

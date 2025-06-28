@@ -5,12 +5,13 @@ import { HttpAgent } from '@dfinity/agent';
 import { createActor, canisterId } from '@/declarations/backend';
 import { authHooks } from '@ic-reactor/react/dist/helpers';
 import { AgentManager } from '@ic-reactor/react/dist/types';
+import { Principal } from '@dfinity/principal';
 
 const identityProvider = 'https://identity.ic0.app';
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  principal: string | null;
+  principal: Principal;
   login: () => void;
   logout: () => void;
   loginLoading: boolean;
@@ -19,7 +20,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
-  principal: null,
+  principal: Principal.anonymous(),
   login: async () => {},
   logout: async () => {},
   loginLoading: false,
@@ -30,9 +31,9 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const agent: AgentManager = useAgentManager();
   const { useAuth, useAuthState, useUserPrincipal } = authHooks(agent);
-  const { authenticated, login, logout, loginLoading } = useAuth();
+  const { authenticated, login, logout, loginLoading, identity } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [principal, setPrincipal] = useState<string | null>(null);
+  const [principal, setPrincipal] = useState<Principal>();
   const [actor, setActor] = useState<any | null>(null); // Replace 'any' with your actor type
 
   // Handle login
@@ -48,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('logout');
     logout();
     setIsAuthenticated(false);
-    setPrincipal(null);
+    setPrincipal(Principal.anonymous());
     setActor(null);
     console.log('logout success');
   };
@@ -59,25 +60,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const isLoggedIn = await authClient.isAuthenticated();
 
       //
-      console.log("AuthClient isAuthenticated:", isLoggedIn);
+      console.log('AuthClient isAuthenticated:', isLoggedIn);
 
       if (isLoggedIn) {
-        const identity = authClient.getIdentity();
+        if (!identity) {
+          console.error('Identity is null, cannot create HttpAgent.');
+          return;
+        }
         const agent = new HttpAgent({ identity });
-        
+
         //
         const principal = identity.getPrincipal().toText();
-        console.log("Principal from AuthClient:", principal);
-        
+        console.log('Principal from AuthClient:', principal);
+
         if (process.env.NODE_ENV !== 'production') {
           await agent.fetchRootKey();
         }
         const actorInstance = createActor(canisterId, { agent });
         setActor(actorInstance);
         setIsAuthenticated(true);
-        setPrincipal(identity.getPrincipal().toText());
-      } else{
-        console.log("AuthClient not logged in");
+        setPrincipal(identity.getPrincipal());
+      } else {
+        console.log('AuthClient not logged in');
       }
     } catch (error) {
       console.error('Authentication check failed:', error);
@@ -90,8 +94,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    console.log("Authenticated:", isAuthenticated);
-    console.log("Principal:", principal);
+    console.log('Authenticated:', isAuthenticated);
+    console.log('Principal:', principal);
     setIsAuthenticated(authenticated);
     if (authenticated) {
       checkAuth();
@@ -102,7 +106,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider
       value={{
         isAuthenticated,
-        principal,
+        principal: identity ? identity.getPrincipal() : Principal.anonymous(),
         login: handleLogin,
         logout: handleLogout,
         loginLoading: loginLoading,
