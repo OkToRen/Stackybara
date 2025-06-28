@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAgent, useAgentManager, useAuth } from '@ic-reactor/react';
 import { AuthClient } from '@dfinity/auth-client';
-import { HttpAgent } from '@dfinity/agent';
+import { Actor, HttpAgent } from '@dfinity/agent';
 import { createActor, canisterId } from '@/declarations/backend';
 import { authHooks } from '@ic-reactor/react/dist/helpers';
 import { AgentManager } from '@ic-reactor/react/dist/types';
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { authenticated, login, logout, loginLoading, identity } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [principal, setPrincipal] = useState<Principal>();
-  const [actor, setActor] = useState<any | null>(null); // Replace 'any' with your actor type
+  const [actor, setActor] = useState<Actor | null>(null); // Replace 'any' with your actor type
 
   // Handle login
   const handleLogin = () => {
@@ -56,22 +56,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAuth = async () => {
     try {
-      const authClient = await AuthClient.create();
-      const isLoggedIn = await authClient.isAuthenticated();
-
-      //
-      console.log('AuthClient isAuthenticated:', isLoggedIn);
-
-      if (isLoggedIn) {
+      if (authenticated) {
         if (!identity) {
           console.error('Identity is null, cannot create HttpAgent.');
           return;
         }
         const agent = new HttpAgent({ identity });
-
-        //
-        const principal = identity.getPrincipal().toText();
-        console.log('Principal from AuthClient:', principal);
 
         if (process.env.NODE_ENV !== 'production') {
           await agent.fetchRootKey();
@@ -88,14 +78,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // Run checkAuth on component mount
   useEffect(() => {
     checkAuth();
   }, []);
 
   useEffect(() => {
-    console.log('Authenticated:', isAuthenticated);
-    console.log('Principal:', principal);
     setIsAuthenticated(authenticated);
     if (authenticated) {
       checkAuth();

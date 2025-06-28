@@ -19,7 +19,8 @@ import { PrivateRoute } from './routes/PrivateRoute';
 import CheckoutPage from './pages/CheckOutPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
-import PostUserLoginPage from './pages/PostUserLoginPage';  
+import PostUserLoginPage from './pages/PostUserLoginPage';
+import LoadingScreen from './pages/LoadingScreen';
 
 function App() {
   return (

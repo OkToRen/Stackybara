@@ -1,6 +1,4 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   User,
   Settings,
@@ -23,26 +21,25 @@ import { useAuthContext } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { backend } from '@/declarations/backend';
 import { UserData } from '@/declarations/backend/backend.did';
+import { useLoading } from '@/hooks/UseLoading';
+import StackybaraLoadingPage from '@/pages/LoadingScreen';
 
 export default function ProfilePage() {
   const auth = useAuthContext();
   const navigate = useNavigate();
+  const loading = useLoading();
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserData>({
-    name: 'Alex Johnson',
-    email: 'alex.johnson@email.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Main St, San Francisco, CA 94102',
-    joinDate: 'January 2023',
-    membershipLevel: 'Gold',
-  });
-  const [totalOrders, setTotalOrders] = useState();
-  const [totalSpent, setTotalSpent] = useState();
+  const [userInfo, setUserInfo] = useState<UserData>();
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
 
-  const getUser = async () => {
-    const response = await backend.getUser();
-    console.log(response);
-  };
+  const getUser = useCallback(() => {
+    return loading.withLoading(async () => {
+      const response = await backend.getUser();
+      console.log(response);
+      setUserInfo(Array.isArray(response) ? response[0] : undefined);
+    });
+  }, [loading]);
 
   const registerUser = async () => {
     console.log('registering user');
@@ -50,6 +47,7 @@ export default function ProfilePage() {
       'darren',
       'darrenharyanto@gmail.com',
       'Jakarta',
+      '08111777566',
       false,
     );
     console.log(response);
@@ -115,9 +113,12 @@ export default function ProfilePage() {
     },
   ];
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsEditing(false);
-    // Here you would typically save to backend
+
+    if (userInfo) {
+      await backend.updateUser(userInfo);
+    }
   };
 
   const handleLogoutClick = () => {
@@ -150,6 +151,10 @@ export default function ProfilePage() {
     }
   };
 
+  if (loading.isLoading) {
+    return <StackybaraLoadingPage />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
@@ -175,17 +180,27 @@ export default function ProfilePage() {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                       <h1 className="text-3xl font-bold text-amber-900 mb-2">
-                        {userInfo.name}
+                        {userInfo?.name ?? ''}
                       </h1>
-                      <p className="text-amber-700 mb-2">{userInfo.email}</p>
+                      <p className="text-amber-700 mb-2">
+                        {userInfo?.email ?? ''}
+                      </p>
                       <div className="flex items-center gap-4">
                         <Badge
-                          className={`bg-gradient-to-r ${getMembershipColor(userInfo.membershipLevel)} text-white`}
+                          className={`bg-gradient-to-r ${getMembershipColor(userInfo?.membershipLevel ?? '')} text-white`}
                         >
-                          {userInfo.membershipLevel} Member
+                          {(userInfo?.membershipLevel ?? '') + ' Member'}
                         </Badge>
                         <span className="text-sm text-amber-600">
-                          Member since {userInfo.joinDate}
+                          Member since{' '}
+                          {userInfo?.createdAt
+                            ? new Date(
+                                Number(userInfo.createdAt) / 1_000_000,
+                              ).toLocaleString('default', {
+                                month: 'long',
+                                year: 'numeric',
+                              })
+                            : ''}
                         </span>
                       </div>
                     </div>
@@ -217,13 +232,13 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                 <div className="text-center p-4 bg-amber-50 rounded-lg">
                   <div className="text-2xl font-bold text-amber-900">
-                    {userInfo.totalOrders}
+                    {totalOrders}
                   </div>
                   <div className="text-amber-700">Total Orders</div>
                 </div>
                 <div className="text-center p-4 bg-teal-50 rounded-lg">
                   <div className="text-2xl font-bold text-teal-900">
-                    ${userInfo.totalSpent}
+                    ${totalSpent}
                   </div>
                   <div className="text-teal-700">Total Spent</div>
                 </div>
@@ -293,9 +308,13 @@ export default function ProfilePage() {
                       Full Name
                     </label>
                     <Input
-                      value={userInfo.name}
+                      value={userInfo?.name ?? ''}
                       onChange={(e) =>
-                        setUserInfo({ ...userInfo, name: e.target.value })
+                        setUserInfo(
+                          userInfo
+                            ? { ...userInfo, name: e.target.value }
+                            : userInfo,
+                        )
                       }
                       disabled={!isEditing}
                       className="border-amber-300 focus:border-teal-400"
@@ -306,9 +325,13 @@ export default function ProfilePage() {
                       Email Address
                     </label>
                     <Input
-                      value={userInfo.email}
+                      value={userInfo?.email ?? ''}
                       onChange={(e) =>
-                        setUserInfo({ ...userInfo, email: e.target.value })
+                        setUserInfo(
+                          userInfo
+                            ? { ...userInfo, email: e.target.value }
+                            : userInfo,
+                        )
                       }
                       disabled={!isEditing}
                       className="border-amber-300 focus:border-teal-400"
@@ -319,9 +342,13 @@ export default function ProfilePage() {
                       Phone Number
                     </label>
                     <Input
-                      value={userInfo.phone}
+                      value={userInfo?.phone ?? ''}
                       onChange={(e) =>
-                        setUserInfo({ ...userInfo, phone: e.target.value })
+                        setUserInfo(
+                          userInfo
+                            ? { ...userInfo, phone: e.target.value }
+                            : userInfo,
+                        )
                       }
                       disabled={!isEditing}
                       className="border-amber-300 focus:border-teal-400"
@@ -332,9 +359,13 @@ export default function ProfilePage() {
                       Address
                     </label>
                     <Input
-                      value={userInfo.address}
+                      value={userInfo?.address ?? ''}
                       onChange={(e) =>
-                        setUserInfo({ ...userInfo, address: e.target.value })
+                        setUserInfo(
+                          userInfo
+                            ? { ...userInfo, address: e.target.value }
+                            : userInfo,
+                        )
                       }
                       disabled={!isEditing}
                       className="border-amber-300 focus:border-teal-400"
