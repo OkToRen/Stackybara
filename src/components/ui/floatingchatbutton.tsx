@@ -5,17 +5,10 @@ import ChatbotModal from '@/components/ChatModal';
 
 export default function FloatingChatButton() {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [hasNotification, setHasNotification] = useState(true);
 
-  useEffect(() => {
-    // Show the floating button after a delay
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 3000);
 
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     // Remove notification after first interaction
