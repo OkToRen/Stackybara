@@ -3,9 +3,6 @@ import Logo from '@/assets/Logo.png';
 
 export default function StackybaraLoadingPage({
   message = 'Loading Stackybara...',
-  onComplete = null,
-  autoComplete = true,
-  duration = 4000,
 }) {
   const [currentProgress, setCurrentProgress] = useState(0);
   const [currentFeature, setCurrentFeature] = useState(0);
@@ -52,23 +49,6 @@ export default function StackybaraLoadingPage({
   ];
 
   const brandName = 'Stackybara';
-
-  // Progress animation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentProgress((prev) => {
-        if (prev >= 100) {
-          if (autoComplete && onComplete) {
-            setTimeout(() => {}, 500);
-          }
-          return 100;
-        }
-        return prev + Math.random() * 8 + 2;
-      });
-    }, 150);
-
-    return () => clearInterval(interval);
-  }, [autoComplete, onComplete]);
 
   // Feature cycling
   useEffect(() => {
@@ -203,22 +183,6 @@ export default function StackybaraLoadingPage({
           <p className="text-amber-700 mb-8 text-lg font-medium">
             Decentralized Shopping Platform
           </p>
-
-          {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="w-full h-2 bg-amber-500/20 rounded-full overflow-hidden relative">
-              <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full transition-all duration-300 ease-out relative"
-                style={{ width: `${Math.min(currentProgress, 100)}%` }}
-              >
-                <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
-              </div>
-            </div>
-            <div className="flex justify-between text-xs text-amber-700 mt-2">
-              <span>{Math.round(currentProgress)}%</span>
-              <span>Loading...</span>
-            </div>
-          </div>
 
           {/* Current Feature */}
           <div className="mb-8 min-h-[60px] flex items-center justify-center">

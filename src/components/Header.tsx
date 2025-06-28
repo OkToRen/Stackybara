@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Logo from '@/assets/logo.png'; // Adjust the path as necessary
 import { useCart } from '@/lib/CartContext';
 import { useAuthContext } from '@/lib/AuthContext';
+import FloatingChatButton from './ui/floatingchatbutton';
 
 export default function Header() {
   const auth = useAuthContext();
@@ -92,7 +93,6 @@ export default function Header() {
               </Link>
             </nav>
             {auth.isAuthenticated ? (
-              
               <Button
                 variant="ghost"
                 size="icon"
@@ -110,7 +110,7 @@ export default function Header() {
                 Login
               </Button>
             )}
-            {auth.isAuthenticated ? (
+            {auth.isAuthenticated && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -123,18 +123,8 @@ export default function Header() {
                   </Badge>
                 </Link>
               </Button>
-            ) : (
-              // login pop up
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-amber-800 hover:text-teal-600 relative"
-                onClick={() => setShowLoginModal(true)}
-              >
-                  <ShoppingCart className="h-5 w-5" />
-              </Button>
             )}
-            
+
             <Button
               variant="ghost"
               size="icon"
@@ -154,7 +144,7 @@ export default function Header() {
             />
           </div>
         </div>
-      </div>      
+      </div>
     </header>
   );
 }
