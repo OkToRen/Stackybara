@@ -110,28 +110,18 @@ export default function Header() {
                 Login
               </Button>
             )}
-            {auth.isAuthenticated ? (
+            {auth.isAuthenticated && (
               <Button
                 variant="ghost"
                 size="icon"
                 className="text-amber-800 hover:text-teal-600 relative"
-              >
+              > 
                 <Link to={'/cart'} className="flex items-center">
                   <ShoppingCart className="h-5 w-5" />
                   <Badge className="absolute -top-2 -right-2 bg-teal-500 text-white text-xs px-1.5 py-0.5">
                     {cartCount}
                   </Badge>
                 </Link>
-              </Button>
-            ) : (
-              // login pop up
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-amber-800 hover:text-teal-600 relative"
-                onClick={() => setShowLoginModal(true)}
-              >
-                  <ShoppingCart className="h-5 w-5" />
               </Button>
             )}
             
