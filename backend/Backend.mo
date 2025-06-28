@@ -6,6 +6,7 @@ import Iter "mo:base/Iter";
 import Int "mo:base/Int";
 import Nat "mo:base/Nat";
 import Debug "mo:base/Debug";
+import Time "mo:base/Time";
 
 actor class Backend() {
 
@@ -19,8 +20,11 @@ actor class Backend() {
     principal : Principal;
     name : Text;
     email : Text;
-    userLocation : Text;
+    address : Text;
+    phone : Text;
     isSeller : Bool;
+    createdAt : Time.Time;
+    membershipLevel : Text;
   };
 
   type Store = {
@@ -83,20 +87,31 @@ actor class Backend() {
   stable var nextOrderId: Nat32 = 1;
   stable var nextStoreId: Nat32 = 1;
 
-  public shared(msg) func registerUser(name : Text, email : Text, userLocation : Text, isSeller : Bool) : async Text {
+  public shared(msg) func registerUser(
+    name : Text,
+    email : Text,
+    address : Text,
+    phone : Text,
+    isSeller : Bool
+  ) : async Text {
     let user = msg.caller;
 
     let key : Trie.Key<Principal> = {
       hash = Principal.hash(user);
       key = user;
     };
+
+    let now = Time.now();
 
     let cleanData : UserData = {
       principal = user;
       name = name;
       email = email;
-      userLocation = userLocation;
+      address = address;
+      phone = phone;
       isSeller = isSeller;
+      createdAt = now;
+      membershipLevel = "Silver"; // or "Gold", "Platinum", etc.
     };
 
     if (Trie.get(users, key, Principal.equal) == null) {
@@ -108,29 +123,6 @@ actor class Backend() {
     }
   };
 
-  public shared(msg) func testRegisterUser(principal : Principal, name : Text, email : Text, userLocation : Text, isSeller : Bool) : async Text {
-    let user = msg.caller;
-    let key : Trie.Key<Principal> = {
-      hash = Principal.hash(user);
-      key = user;
-    };
-
-    let cleanData : UserData = {
-      principal = principal;
-      name = name;
-      email = email;
-      userLocation = userLocation;
-      isSeller = isSeller;
-    };
-
-    if (Trie.get(users, key, Principal.equal) == null) {
-      let (updatedUsers, _) = Trie.put(users, key, Principal.equal, cleanData);
-      users := updatedUsers;
-      return "User registered";
-    } else {
-      return "User already registered";
-    }
-  };
 
   public query func getAllUsers() : async [(Principal, UserData)] {
     return Trie.toArray<Principal, UserData, (Principal, UserData)>(users, func (k : Principal, v : UserData) : (Principal, UserData) = (k, v));
@@ -177,32 +169,6 @@ actor class Backend() {
       return "User not found";
     }
   };
-
-  public shared func seedUsers() : async Text {
-  var newUsers = users;
-
-  for (i in Iter.range(1, 10)) {
-    let principalText = "w7x7r-cok77-xa"; // seharusnya beda tiap user untuk testing
-    let principal = Principal.fromText(principalText);
-    let key = { hash = Principal.hash(principal); key = principal };
-
-    let user : UserData = {
-      principal = principal;
-      name = "User #" # Nat.toText(i);
-      email = "user" # Nat.toText(i) # "@example.com";
-      userLocation = "Test City";
-      isSeller = i % 2 == 0;
-    };
-
-    let (updated, _) = Trie.put(newUsers, key, Principal.equal, user);
-    newUsers := updated;
-  };
-
-  users := newUsers;
-
-  return "Seeded 10 users";
-};
-
 
   /* PRODUCT */
   public shared(msg) func createProduct(

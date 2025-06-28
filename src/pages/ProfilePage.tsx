@@ -22,28 +22,42 @@ import { useAuth } from '@ic-reactor/react';
 import { useAuthContext } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { backend } from '@/declarations/backend';
+import { UserData } from '@/declarations/backend/backend.did';
 
 export default function ProfilePage() {
   const auth = useAuthContext();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState({
+  const [userInfo, setUserInfo] = useState<UserData>({
     name: 'Alex Johnson',
     email: 'alex.johnson@email.com',
     phone: '+1 (555) 123-4567',
     address: '123 Main St, San Francisco, CA 94102',
     joinDate: 'January 2023',
-    totalOrders: 24,
-    totalSpent: 1847.5,
     membershipLevel: 'Gold',
   });
+  const [totalOrders, setTotalOrders] = useState();
+  const [totalSpent, setTotalSpent] = useState();
 
-  const getUser = () => {
-    const response = backend.getUser();
+  const getUser = async () => {
+    const response = await backend.getUser();
     console.log(response);
   };
 
+  const registerUser = async () => {
+    console.log('registering user');
+    const response = await backend.registerUser(
+      'darren',
+      'darrenharyanto@gmail.com',
+      'Jakarta',
+      false,
+    );
+    console.log(response);
+    console.log('registering user finished');
+  };
+
   useEffect(() => {
+    registerUser();
     getUser();
   }, []);
 
