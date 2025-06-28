@@ -21,6 +21,7 @@ const products = [
     badge: 'Best Seller',
     description:
       'Premium quality wireless headphones with noise cancellation',
+    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae', // Example principal
   },
   {
     id: 2,
@@ -34,6 +35,7 @@ const products = [
     category: 'Electronics',
     badge: 'New',
     description: 'Track your fitness goals with this advanced smartwatch',
+    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
   },
   {
     id: 3,
@@ -47,6 +49,7 @@ const products = [
     category: 'Office',
     badge: 'Sale',
     description: 'Adjustable aluminum laptop stand for better posture',
+    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
   },
   {
     id: 4,
@@ -60,6 +63,7 @@ const products = [
     category: 'Electronics',
     badge: 'Popular',
     description: 'Waterproof speaker with 12-hour battery life',
+    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
   },
   {
     id: 5,
@@ -73,6 +77,7 @@ const products = [
     category: 'Fashion',
     badge: 'Eco-Friendly',
     description: 'Sustainable fashion made from 100% organic cotton',
+    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
   },
   {
     id: 6,
@@ -86,6 +91,7 @@ const products = [
     category: 'Home',
     badge: 'Energy Efficient',
     description: 'Adjustable LED lamp with multiple brightness levels',
+    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
   },
 ];
 
@@ -275,6 +281,21 @@ export default function ProductDetailsPage() {
                 </div>
                 <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white text-lg py-3 flex items-center justify-center gap-2" onClick={() => handleAddToCart(product)}>
                   <ShoppingCart className="h-5 w-5" /> Add to Cart - ${(product.price * quantity).toFixed(2)}
+                </Button>
+                {/* Chat to Seller Button */}
+                <Button
+                  className="w-full mt-2 bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white text-lg py-3 flex items-center justify-center gap-2"
+                  onClick={() => {
+                    console.log('Product:', product);
+                    // Use product.sellerPrincipal if available, else fallback or show error
+                    if (!product.sellerPrincipal) {
+                      alert('Seller information not available for this product.');
+                      return;
+                    }
+                    navigate(`/chat/${product.sellerPrincipal}`);
+                  }}
+                >
+                  💬 Chat to Seller
                 </Button>
               </div>
             </div>

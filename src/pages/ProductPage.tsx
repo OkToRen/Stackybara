@@ -77,6 +77,7 @@ export default function ProductsPage() {
       badge: 'Best Seller',
       description:
         'Premium quality wireless headphones with noise cancellation',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae', // Example principal
     },
     {
       id: 2,
@@ -90,6 +91,7 @@ export default function ProductsPage() {
       category: 'Electronics',
       badge: 'New',
       description: 'Track your fitness goals with this advanced smartwatch',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
     {
       id: 3,
@@ -103,6 +105,7 @@ export default function ProductsPage() {
       category: 'Office',
       badge: 'Sale',
       description: 'Adjustable aluminum laptop stand for better posture',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
     {
       id: 4,
@@ -116,6 +119,7 @@ export default function ProductsPage() {
       category: 'Electronics',
       badge: 'Popular',
       description: 'Waterproof speaker with 12-hour battery life',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
     {
       id: 5,
@@ -129,6 +133,7 @@ export default function ProductsPage() {
       category: 'Fashion',
       badge: 'Eco-Friendly',
       description: 'Sustainable fashion made from 100% organic cotton',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
     {
       id: 6,
@@ -142,6 +147,7 @@ export default function ProductsPage() {
       category: 'Home',
       badge: 'Energy Efficient',
       description: 'Adjustable LED lamp with multiple brightness levels',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
   ];
 

@@ -19,7 +19,7 @@ export default function PostUserLoginPage() {
   const registerUser = (name: string, email: string, address: string, phone: string) => {
     console.log('registering user');
     const response = backend.registerUser(
-      auth.principal, name, email, phone, address
+       name, email, phone, address, false, auth.principal,
     );
     console.log(Array.isArray(response) ? response[0] : undefined);
     console.log('registering user finished');

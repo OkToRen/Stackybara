@@ -23,6 +23,7 @@ import PostUserLoginPage from './pages/PostUserLoginPage';
 import LoadingScreen from './pages/LoadingScreen';
 import ChatPage from './pages/ChatPage';
 import ScrollToTop from './hooks/UseScrollToTop';
+import ChatRoomPage from './pages/ChatRoomPage';
 
 function App() {
   return (
@@ -46,7 +47,7 @@ function App() {
                 <Route path="/my-orders" element={<MyOrdersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/cart" element={<CartPage />} />
-                <Route path="/chat" element={<ChatPage />} />
+                <Route path="/chat/:sellerPrincipal" element={<ChatRoomPage />} />
               </Route>
 
               <Route path="/order/:orderId" element={<OrderDetailPage />} />

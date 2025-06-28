@@ -56,6 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const checkAuth = async () => {
     try {
+      console.log(identity?.getPrincipal().toText(), 'identity principal');
       if (authenticated) {
         if (!identity) {
           console.error('Identity is null, cannot create HttpAgent.');

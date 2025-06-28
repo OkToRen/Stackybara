@@ -10,6 +10,7 @@ export type Product = {
   image: string;
   category: string;
   description: string;
+  sellerPrincipal: string;
 };
 
 interface ProductContextType{

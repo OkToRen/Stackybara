@@ -76,6 +76,31 @@ actor class Backend() {
     paymentMethod : Text;
   };
 
+  // --- CHAT TYPES & STORAGE ---
+  type Message = {
+    id : Nat32;
+    content : Text;
+    sender : Principal;
+    timestamp : Time.Time;
+  };
+
+  type MessageResponse = {
+    message : Message;
+    name : Text; // Name of the sender
+  };
+
+  type Chat = {
+    id : Nat32;
+    user1 : Principal;
+    user2 : Principal;
+    messages : [Nat32];
+  };
+
+  stable var chatMessages : Trie.Trie<Nat32, Message> = Trie.empty();
+  stable var chats : Trie.Trie<Nat32, Chat> = Trie.empty();
+  stable var nextChatId : Nat32 = 1;
+  stable var nextMessageId : Nat32 = 1;
+
   var users : Trie.Trie<Principal, UserData> = Trie.empty();
   stable var products : Trie.Trie<Nat32, Product> = Trie.empty();
   stable var stores : Trie.Trie<Nat32, Store> = Trie.empty();
@@ -86,14 +111,14 @@ actor class Backend() {
   stable var nextStoreId : Nat32 = 1;
 
   public func registerUser(
-    principal : Principal,
     name : Text,
     email : Text,
     address : Text,
     phone : Text,
+    isSeller : Bool,
+    principal : Principal
   ) : async Text {
     let user = principal;
-
     let key : Trie.Key<Principal> = {
       hash = Principal.hash(user);
       key = user;
@@ -354,8 +379,94 @@ actor class Backend() {
 
         return true;
       };
-      case (?_) { return false };
+      case (?_) { return false; }; 
     };
   };
 
+  // --- CHAT FUNCTIONS ---
+  public func createOrGetChat(user1: Principal, user2: Principal) : async Chat {
+    // Try to find existing chat
+    let allChats = Trie.toArray<Nat32, Chat, Chat>(chats, func (k, v) = v);
+    let found = Array.find<Chat>(allChats, func (c) = (c.user1 == user1 and c.user2 == user2) or (c.user1 == user2 and c.user2 == user1));
+    switch (found) {
+      case (?chat) { return chat; };
+      case null {
+        let chatId = nextChatId;
+        nextChatId += 1;
+        let newChat : Chat = {
+          id = chatId;
+          user1 = user1;
+          user2 = user2;
+          messages = [];
+        };
+        let key = { hash = chatId; key = chatId };
+        let (updatedChats, _) = Trie.put(chats, key, Nat32.equal, newChat);
+        chats := updatedChats;
+        return newChat;
+      }
+    }
+  };
+
+  public func sendMessage(user1: Principal, user2: Principal, content: Text) : async ?Message {
+    let chat = await createOrGetChat(user1, user2);
+    let messageId = nextMessageId;
+    nextMessageId += 1;
+    let message : Message = {
+      id = messageId;
+      content = content;
+      sender = user1;
+      timestamp = Time.now();
+    };
+    let key = { hash = messageId; key = messageId };
+    let (updatedMessages, _) = Trie.put(chatMessages, key, Nat32.equal, message);
+    chatMessages := updatedMessages;
+    // Update chat's messages
+    let chatKey = { hash = chat.id; key = chat.id };
+    let updatedChat : Chat = {
+      id = chat.id;
+      user1 = chat.user1;
+      user2 = chat.user2;
+      messages = Array.append(chat.messages, [messageId]);
+    };
+    let (updatedChats, _) = Trie.put(chats, chatKey, Nat32.equal, updatedChat);
+    chats := updatedChats;
+    return ?message;
+  };
+
+  public query func getMessages(user1: Principal, user2: Principal) : async [MessageResponse] {
+    let allChats = Trie.toArray<Nat32, Chat, Chat>(chats, func (k, v) = v);
+    let found = Array.find<Chat>(allChats, func (c) = (c.user1 == user1 and c.user2 == user2) or (c.user1 == user2 and c.user2 == user1));
+    switch (found) {
+      case null { return []; };
+      case (?chat) {
+        let msgs = Array.map<Nat32, MessageResponse>(chat.messages, func (mid) {
+          let key = { hash = mid; key = mid };
+          switch (Trie.get(chatMessages, key, Nat32.equal)) {
+            case (?m) {
+              // Fetch sender name from users Trie
+              let senderKey = { hash = Principal.hash(m.sender); key = m.sender };
+              let senderName = switch (Trie.get(users, senderKey, Principal.equal)) {
+                case (?user) { user.name };
+                case null { Principal.toText(m.sender) };
+              };
+              {
+                message = m;
+                name = senderName;
+              }
+            };
+            case null { {
+              message = {
+                id = mid;
+                content = "[deleted]";
+                sender = Principal.fromText("");
+                timestamp = 0;
+              };
+              name = "[deleted]";
+            }}
+          }
+        });
+        return msgs;
+      }
+    }
+  };
 };
