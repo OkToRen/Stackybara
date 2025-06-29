@@ -5,12 +5,20 @@ Shoppybara is a modern, decentralized e-commerce platform powered by blockchain 
 > "Because capybaras deserve smooth shopping too."
 
 ---
+##  📝 Documentation
 
-📝 Documentation
 Notion :
 https://roderick-aurelius.notion.site/Shoppybara-Documentation-2217424006ab80f88fb3fa71aa2528a8?source=copy_link
 
 ---
+
+## 📈 Pitch Deck
+
+Canva :
+https://www.canva.com/design/DAGrv51meyM/hw8-i1oeOyI0S_sXcxqmKg/view?utm_content=DAGrv51meyM&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hf0cf3ef48b
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
