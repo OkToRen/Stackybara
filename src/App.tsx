@@ -12,7 +12,7 @@ import ProductManagerPage from './pages/ProductManagerPage';
 import OrderPage from './pages/OrderPage';
 import StoreProfilePage from './pages/StoreProfilePage';
 import { CartProvider } from './lib/CartContext';
-import CartPage from  './pages/CartPage';
+import CartPage from './pages/CartPage';
 import { ProductProvider } from './lib/ProductContext';
 import { PrivateRoute } from './routes/PrivateRoute';
 import CheckoutPage from './pages/CheckOutPage';
@@ -25,47 +25,64 @@ import ChatPage from './pages/ChatPage';
 import ScrollToTop from './hooks/UseScrollToTop';
 import ChatRoomPage from './pages/ChatRoomPage';
 import SellerProfilePage from './pages/SellerProfilePage';
+import SupportPage from './pages/SupportPage';
+import { TicketProvider } from './lib/TicketContext';
 
 function App() {
   return (
-    <CartProvider>
-      <ProductProvider>
-        <Router>
-          <ScrollToTop />
-          <div className="App">
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<HomePage />} />
-                {/* <Route path="categories" element={<CategoriesPage />} /> */}
-                <Route path="products" element={<ProductsPage />} />
-                <Route path="productdetails" element={<ProductDetailsPage />} />
-                <Route path="about" element={<AboutPage />} />
-                <Route path="/postlogin" element={<PostUserLoginPage />} />
-                <Route path="/postseller" element={<PostUserToSellerPage />} />
-              </Route>
+    <TicketProvider>
+      <CartProvider>
+        <ProductProvider>
+          <Router>
+            <ScrollToTop />
+            <div className="App">
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<HomePage />} />
+                  {/* <Route path="categories" element={<CategoriesPage />} /> */}
+                  <Route path="products" element={<ProductsPage />} />
+                  <Route
+                    path="productdetails"
+                    element={<ProductDetailsPage />}
+                  />
+                  <Route path="about" element={<AboutPage />} />
+                  <Route path="postlogin" element={<PostUserLoginPage />} />
+                  <Route path="postseller" element={<PostUserToSellerPage />} />
+                </Route>
 
-              <Route element={<PrivateRoute />}>
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/my-orders" element={<MyOrdersPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/chat/:sellerPrincipal" element={<ChatRoomPage />} />
-                <Route path="/seller/:sellerPrincipal" element={<SellerProfilePage />} />
-              </Route>
+                <Route element={<PrivateRoute />}>
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/my-orders" element={<MyOrdersPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route
+                    path="/chat/:sellerPrincipal"
+                    element={<ChatRoomPage />}
+                  />
+                  <Route
+                    path="/seller/:sellerPrincipal"
+                    element={<SellerProfilePage />}
+                  />
+                  <Route path="/support" element={<SupportPage />} />
+                </Route>
 
-              <Route path="/order/:orderId" element={<OrderDetailPage />} />
+                <Route path="/order/:orderId" element={<OrderDetailPage />} />
 
-              <Route path="/seller" element={<SellerLayout />}>
-                <Route index element={<DashboardPage />} />
-                <Route path="productmanager" element={<ProductManagerPage />} />
-                <Route path="orders" element={<OrderPage />} />
-                <Route path="profile" element={<StoreProfilePage />} />
-              </Route>
-            </Routes>
-          </div>
-        </Router>
-      </ProductProvider>
-    </CartProvider>
+                <Route path="/seller" element={<SellerLayout />}>
+                  <Route index element={<DashboardPage />} />
+                  <Route
+                    path="productmanager"
+                    element={<ProductManagerPage />}
+                  />
+                  <Route path="orders" element={<OrderPage />} />
+                  <Route path="profile" element={<StoreProfilePage />} />
+                </Route>
+              </Routes>
+            </div>
+          </Router>
+        </ProductProvider>
+      </CartProvider>
+    </TicketProvider>
   );
 }
 

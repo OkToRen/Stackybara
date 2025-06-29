@@ -1,11 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuthContext } from '@/lib/AuthContext';
 import Layout from '@/layout/Layout';
+import StackybaraLoadingPage from '@/pages/LoadingScreen';
 
 export const PrivateRoute = () => {
-  const auth = useAuthContext();
+  const { isAuthenticated, loginLoading, authChecked } = useAuthContext();
 
-  if (auth.loginLoading) return <div>Loading...</div>; // Or a spinner component
+  if (!authChecked || loginLoading) return <StackybaraLoadingPage />;
 
-  return auth.isAuthenticated ? <Layout /> : <Navigate to="/" replace />;
+  return isAuthenticated ? <Layout /> : <Navigate to="/" replace />;
 };
