@@ -12,7 +12,7 @@ import ProductManagerPage from './pages/ProductManagerPage';
 import OrderPage from './pages/OrderPage';
 import StoreProfilePage from './pages/StoreProfilePage';
 import { CartProvider } from './lib/CartContext';
-import CartPage from './pages/CartPage';
+import CartPage from  './pages/CartPage';
 import { ProductProvider } from './lib/ProductContext';
 import { PrivateRoute } from './routes/PrivateRoute';
 import CheckoutPage from './pages/CheckOutPage';
@@ -24,6 +24,7 @@ import LoadingScreen from './pages/LoadingScreen';
 import ChatPage from './pages/ChatPage';
 import ScrollToTop from './hooks/UseScrollToTop';
 import ChatRoomPage from './pages/ChatRoomPage';
+import SellerProfilePage from './pages/SellerProfilePage';
 
 function App() {
   return (
@@ -48,10 +49,8 @@ function App() {
                 <Route path="/my-orders" element={<MyOrdersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/cart" element={<CartPage />} />
-                <Route
-                  path="/chat/:sellerPrincipal"
-                  element={<ChatRoomPage />}
-                />
+                <Route path="/chat/:sellerPrincipal" element={<ChatRoomPage />} />
+                <Route path="/seller/:sellerPrincipal" element={<SellerProfilePage />} />
               </Route>
 
               <Route path="/order/:orderId" element={<OrderDetailPage />} />
