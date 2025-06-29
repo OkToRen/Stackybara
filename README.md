@@ -6,6 +6,11 @@ Shoppybara is a modern, decentralized e-commerce platform powered by blockchain 
 
 ---
 
+📝 Documentation
+Notion :
+https://roderick-aurelius.notion.site/Shoppybara-Documentation-2217424006ab80f88fb3fa71aa2528a8?source=copy_link
+
+---
 ## 🚀 Quick Start
 
 ### Prerequisites

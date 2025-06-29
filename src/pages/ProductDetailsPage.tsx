@@ -18,101 +18,91 @@ import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '@/hooks/UseScrollToTop';
 import { useAuthContext } from '@/lib/AuthContext';
 import { useLoading } from '@/hooks/UseLoading';
+import { Product } from '@/declarations/backend/backend.did';
 
 
 // Move products array here for recommendations
-const products = [
-  {
-    id: 1,
-    name: 'Wireless Bluetooth Headphones',
-    price: 89.99,
-    originalPrice: 129.99,
-    rating: 4.8,
-    reviews: 324,
-    image:
-      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-    category: 'Electronics',
-    badge: 'Best Seller',
-    description:
-      'Premium quality wireless headphones with active noise cancellation and 30-hour battery life. Experience crystal-clear audio with deep bass and crisp highs.',
-    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae', // Example principal
-  },
-  {
-    id: 2,
-    name: 'Smart Fitness Watch',
-    price: 199.99,
-    originalPrice: 249.99,
-    rating: 4.6,
-    reviews: 156,
-    image:
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
-    category: 'Electronics',
-    badge: 'New',
-    description:
-      'Track your fitness goals with this advanced smartwatch featuring heart rate monitoring and GPS.',
-    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-  },
-  {
-    id: 3,
-    name: 'Ergonomic Laptop Stand',
-    price: 45.99,
-    originalPrice: 59.99,
-    rating: 4.9,
-    reviews: 89,
-    image:
-      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop',
-    category: 'Office',
-    badge: 'Sale',
-    description:
-      'Adjustable aluminum laptop stand for better posture and improved airflow.',
-    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-  },
-  {
-    id: 4,
-    name: 'Portable Bluetooth Speaker',
-    price: 79.99,
-    originalPrice: 99.99,
-    rating: 4.7,
-    reviews: 203,
-    image:
-      'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop',
-    category: 'Electronics',
-    badge: 'Popular',
-    description:
-      'Waterproof speaker with 360-degree sound and 12-hour battery life.',
-    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-  },
-  {
-    id: 5,
-    name: 'Organic Cotton T-Shirt',
-    price: 24.99,
-    originalPrice: 34.99,
-    rating: 4.5,
-    reviews: 78,
-    image:
-      'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
-    category: 'Fashion',
-    badge: 'Eco-Friendly',
-    description:
-      'Sustainable fashion made from 100% organic cotton with fair trade certification.',
-    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-  },
-  {
-    id: 6,
-    name: 'LED Desk Lamp',
-    price: 39.99,
-    originalPrice: 49.99,
-    rating: 4.4,
-    reviews: 112,
-    image:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-    category: 'Home',
-    badge: 'Energy Efficient',
-    description:
-      'Adjustable LED lamp with multiple brightness levels and wireless charging pad.',
-    sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-  },
-];
+const products: Product[] = [
+    {
+      productId: 10,
+      storeId: 11,
+      name: 'Wireless Bluetooth Headphones',      
+      price: 129.99,
+      stock: 5,
+      rating: 4.8,
+      review: 324,
+      image:
+        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description:
+        'Premium quality wireless headphones with noise cancellation',
+    },
+    {
+      productId: 11,
+      storeId: 12,
+      name: 'Smart Fitness Watch',
+      price: 199.99,
+      stock: 10,
+      rating: 4.6,
+      review: 156,
+      image:
+        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description: 'Track your fitness goals with this advanced smartwatch'
+    },
+    {
+      productId: 12,
+      storeId: 13,
+      name: 'Ergonomic Laptop Stand',
+      price: 45.99,
+      stock: 7,
+      rating: 4.9,
+      review: 89,
+      image:
+        'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop',
+      category: 'Office',
+      description: 'Adjustable aluminum laptop stand for better posture',
+    },
+    {
+      productId: 13,
+      storeId: 14,
+      name: 'Portable Bluetooth Speaker',
+      price: 79.99,
+      stock: 9,
+      rating: 4.7,
+      review: 203,
+      image:
+        'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description: 'Waterproof speaker with 12-hour battery life'
+    },
+    {
+      productId: 15,
+      storeId: 16,
+      name: 'Organic Cotton T-Shirt',
+      price: 24.99,
+      stock: 11,
+      rating: 4.5,
+      review: 78,
+      image:
+        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop',
+      category: 'Fashion',
+      description: 'Sustainable fashion made from 100% organic cotton',
+    },
+    {
+      productId: 16,
+      storeId: 17,
+      name: 'LED Desk Lamp',
+      price: 39.99,
+      stock: 7,
+      rating: 4.4,
+      review: 112,
+      image:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+      category: 'Home',
+      description: 'Adjustable LED lamp with multiple brightness levels',
+    },
+  ];
 
 const reviews = [
   {
@@ -192,12 +182,12 @@ export default function ProductDetailsPage() {
 
   // Dynamic recommendations based on category
   const filteredRecommendations = products
-    .filter((p) => p.category === product?.category && p.id !== product?.id)
+    .filter((p) => p.category === product?.category && p.productId !== product?.productId)
     .slice(0, 3);
 
   // You Might Also Like: products from other categories
   const youMightAlsoLike = products
-    .filter((p) => p.category !== product?.category && p.id !== product?.id)
+    .filter((p) => p.category !== product?.category && p.productId !== product?.productId)
     .slice(0, 3);
 
   const auth = useAuthContext();
@@ -208,22 +198,11 @@ export default function ProductDetailsPage() {
     navigate('/postlogin');
   };
 
-  const handleAddToCart = (product: {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    originalPrice?: number;
-    rating?: number;
-    reviews?: number;
-    category?: string;
-    badge?: string;
-    description?: string;
-  }) => {
+  const handleAddToCart = (product: Product) => {
     if (auth.isAuthenticated) {
       for (let i = 0; i < quantity; i++) {
         addToCart({
-          id: product.id,
+          id: product.productId,
           name: product.name,
           price: product.price,
           image: product.image,
@@ -237,19 +216,7 @@ export default function ProductDetailsPage() {
     }
   };
 
-  const handleRecommendationClick = (rec: {
-    id: number;
-    name: string;
-    price: number;
-    originalPrice: number;
-    rating: number;
-    reviews: number;
-    image: string;
-    category: string;
-    badge?: string;
-    description: string;
-    sellerPrincipal: string;
-  }) => {
+  const handleRecommendationClick = (rec: Product) => {
     setProduct(rec);
     window.scrollTo(0, 0);
   };
@@ -268,22 +235,11 @@ export default function ProductDetailsPage() {
     }));
   };
 
-  const handleRecAddToCart = (rec: {
-    id: any;
-    name: any;
-    price: any;
-    originalPrice?: number;
-    rating?: number;
-    reviews?: number;
-    image: any;
-    category?: string;
-    badge?: string;
-    description?: string;
-  }) => {
-    const qty = recQuantities[rec.id] || 1;
+  const handleRecAddToCart = (rec: Product) => {
+    const qty = recQuantities[rec.productId] || 1;
     for (let i = 0; i < qty; i++) {
       addToCart({
-        id: rec.id,
+        id: rec.productId,
         name: rec.name,
         price: rec.price,
         image: rec.image,
@@ -293,22 +249,11 @@ export default function ProductDetailsPage() {
     setTimeout(() => setCartMessage(null), 3000);
   };
 
-  const handleLikeAddToCart = (rec: {
-    id: any;
-    name: any;
-    price: any;
-    originalPrice?: number;
-    rating?: number;
-    reviews?: number;
-    image: any;
-    category?: string;
-    badge?: string;
-    description?: string;
-  }) => {
-    const qty = likeQuantities[rec.id] || 1;
+  const handleLikeAddToCart = (rec: Product) => {
+    const qty = likeQuantities[rec.productId] || 1;
     for (let i = 0; i < qty; i++) {
       addToCart({
-        id: rec.id,
+        id: rec.productId,
         name: rec.name,
         price: rec.price,
         image: rec.image,
@@ -339,7 +284,7 @@ export default function ProductDetailsPage() {
 
   const discountPercentage = product
     ? Math.round(
-      ((product.originalPrice - product.price) / product.originalPrice) * 100,
+      ((product.price * 90) / 100),
     )
     : 0;
 
@@ -441,7 +386,7 @@ export default function ProductDetailsPage() {
                           {product.rating}
                         </span>
                         <span className="text-sm text-amber-600">
-                          ({product.reviews} reviews)
+                          ({product.review} reviews)
                         </span>
                       </div>
                     </div>
@@ -456,14 +401,14 @@ export default function ProductDetailsPage() {
                       <span className="text-3xl font-bold text-amber-900">
                         ${product.price}
                       </span>
-                      {product.originalPrice > product.price && (
+                      {product.price > product.price && (
                         <>
                           <span className="text-xl line-through text-amber-600">
-                            ${product.originalPrice}
+                            ${product.price}
                           </span>
                           <span className="text-lg font-semibold text-green-600">
                             Save $
-                            {(product.originalPrice - product.price).toFixed(2)}
+                            {(product.price - product.price).toFixed(2)}
                           </span>
                         </>
                       )}
@@ -533,13 +478,7 @@ export default function ProductDetailsPage() {
                         <Button
                           className="w-full mt-2 bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white text-lg py-3 flex items-center justify-center gap-2"
                           onClick={() => {
-                            console.log('Product:', product);
-                            // Use product.sellerPrincipal if available, else fallback or show error
-                            if (!product.sellerPrincipal) {
-                              alert('Seller information not available for this product.');
-                              return;
-                            }
-                            navigate(`/chat/${product.sellerPrincipal}`);
+                            navigate(`/chat`);
                           }}
                         >
                           💬 Chat to Seller
@@ -581,7 +520,7 @@ export default function ProductDetailsPage() {
                   {[
                     { id: 'description', label: 'Description' },
                     { id: 'specs', label: 'Specifications' },
-                    { id: 'reviews', label: `Reviews (${product.reviews})` },
+                    { id: 'reviews', label: `Reviews (${product.review})` },
                   ].map((tabItem) => (
                     <button
                       key={tabItem.id}
@@ -711,7 +650,7 @@ export default function ProductDetailsPage() {
                 <div className="grid md:grid-cols-3 gap-6">
                   {filteredRecommendations.map((rec) => (
                     <Card
-                      key={rec.id}
+                      key={rec.productId}
                       className="border-amber-200 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                       onClick={() => handleRecommendationClick(rec)}
                     >
@@ -722,12 +661,7 @@ export default function ProductDetailsPage() {
                             src={rec.image || '/placeholder.svg'}
                             alt={rec.name}
                             className="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <Badge
-                            className={`absolute top-2 left-2 ${getBadgeColor(rec.badge)} text-white`}
-                          >
-                            {rec.badge}
-                          </Badge>
+                          />                          
                         </div>
 
                         <div className="space-y-3">
@@ -754,7 +688,7 @@ export default function ProductDetailsPage() {
                               ))}
                             </div>
                             <span className="text-xs text-amber-600">
-                              ({rec.reviews})
+                              ({rec.review})
                             </span>
                           </div>
 
@@ -763,7 +697,7 @@ export default function ProductDetailsPage() {
                               ${rec.price}
                             </span>
                             <span className="line-through text-amber-600 text-sm">
-                              ${rec.originalPrice}
+                              ${rec.price}
                             </span>
                           </div>
 
@@ -776,18 +710,18 @@ export default function ProductDetailsPage() {
                                 size="icon"
                                 variant="ghost"
                                 className="h-8 w-8 rounded-full"
-                                onClick={() => handleRecQuantity(rec.id, -1)}
+                                onClick={() => handleRecQuantity(rec.productId, -1)}
                               >
                                 -
                               </Button>
                               <span className="px-2 text-sm">
-                                {recQuantities[rec.id] || 1}
+                                {recQuantities[rec.productId] || 1}
                               </span>
                               <Button
                                 size="icon"
                                 variant="ghost"
                                 className="h-8 w-8 rounded-full"
-                                onClick={() => handleRecQuantity(rec.id, 1)}
+                                onClick={() => handleRecQuantity(rec.productId, 1)}
                               >
                                 +
                               </Button>
@@ -820,7 +754,7 @@ export default function ProductDetailsPage() {
                 <div className="grid md:grid-cols-3 gap-6">
                   {youMightAlsoLike.map((rec) => (
                     <Card
-                      key={rec.id}
+                      key={rec.productId}
                       className="border-amber-200 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                       onClick={() => handleRecommendationClick(rec)}
                     >
@@ -832,11 +766,6 @@ export default function ProductDetailsPage() {
                             alt={rec.name}
                             className="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
                           />
-                          <Badge
-                            className={`absolute top-2 left-2 ${getBadgeColor(rec.badge)} text-white`}
-                          >
-                            {rec.badge}
-                          </Badge>
                         </div>
 
                         <div className="space-y-3">
@@ -863,7 +792,7 @@ export default function ProductDetailsPage() {
                               ))}
                             </div>
                             <span className="text-xs text-amber-600">
-                              ({rec.reviews})
+                              ({rec.review})
                             </span>
                           </div>
 
@@ -872,7 +801,7 @@ export default function ProductDetailsPage() {
                               ${rec.price}
                             </span>
                             <span className="line-through text-amber-600 text-sm">
-                              ${rec.originalPrice}
+                              ${rec.price}
                             </span>
                           </div>
 
@@ -885,18 +814,18 @@ export default function ProductDetailsPage() {
                                 size="icon"
                                 variant="ghost"
                                 className="h-8 w-8 rounded-full"
-                                onClick={() => handleLikeQuantity(rec.id, -1)}
+                                onClick={() => handleLikeQuantity(rec.productId, -1)}
                               >
                                 -
                               </Button>
                               <span className="px-2 text-sm">
-                                {likeQuantities[rec.id] || 1}
+                                {likeQuantities[rec.productId] || 1}
                               </span>
                               <Button
                                 size="icon"
                                 variant="ghost"
                                 className="h-8 w-8 rounded-full"
-                                onClick={() => handleLikeQuantity(rec.id, 1)}
+                                onClick={() => handleLikeQuantity(rec.productId, 1)}
                               >
                                 +
                               </Button>

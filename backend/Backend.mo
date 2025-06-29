@@ -334,6 +334,20 @@ actor class Backend() {
     );
   };
 
+  // stable var products : Trie.Trie<Nat32, Product> = Trie.empty();
+
+  public func getProductById(productId : Nat32) : async [Product] {
+    let productKey = { hash = productId; key = productId };
+    switch (Trie.get(products, productKey, Nat32.equal)) {
+      case (?product) {
+        return [product];
+      };
+      case (_) {
+        return [];
+      };
+    };
+  };
+
   /* ORDER */
   public func getMyOrders(userPrincipal : Principal) : async [Order] {
     let allOrders = Trie.toArray<Nat32, Order, Order>(orders, func(k : Nat32, v : Order) : Order = v);

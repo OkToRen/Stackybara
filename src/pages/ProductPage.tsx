@@ -40,8 +40,8 @@ import { useLoading } from '@/hooks/UseLoading';
 
 export default function ProductsPage() {
   const location = useLocation();
-  const [product, setProduct] = useState<Product>();
-  const [products, setProducts] = useState<Product[]>();
+  const {product, setProduct} = useProduct();
+  const [products, setProducts] = useState<Product[]>([]);
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -53,6 +53,92 @@ export default function ProductsPage() {
   const navigate = useNavigate();
   const auth = useAuthContext();
   const loading = useLoading();
+
+  
+  
+  const initialProducts: Product[] = [
+    {
+      productId: 10,
+      storeId: 11,
+      name: 'Wireless Bluetooth Headphones',      
+      price: 129.99,
+      stock: 5,
+      rating: 4.8,
+      review: 324,
+      image:
+        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description:
+        'Premium quality wireless headphones with noise cancellation',
+    },
+    {
+      productId: 11,
+      storeId: 12,
+      name: 'Smart Fitness Watch',
+      price: 199.99,
+      stock: 10,
+      rating: 4.6,
+      review: 156,
+      image:
+        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description: 'Track your fitness goals with this advanced smartwatch'
+    },
+    {
+      productId: 12,
+      storeId: 13,
+      name: 'Ergonomic Laptop Stand',
+      price: 45.99,
+      stock: 7,
+      rating: 4.9,
+      review: 89,
+      image:
+        'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop',
+      category: 'Office',
+      description: 'Adjustable aluminum laptop stand for better posture',
+    },
+    {
+      productId: 13,
+      storeId: 14,
+      name: 'Portable Bluetooth Speaker',
+      price: 79.99,
+      stock: 9,
+      rating: 4.7,
+      review: 203,
+      image:
+        'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description: 'Waterproof speaker with 12-hour battery life'
+    },
+    {
+      productId: 15,
+      storeId: 16,
+      name: 'Organic Cotton T-Shirt',
+      price: 24.99,
+      stock: 11,
+      rating: 4.5,
+      review: 78,
+      image:
+        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop',
+      category: 'Fashion',
+      description: 'Sustainable fashion made from 100% organic cotton',
+    },
+    {
+      productId: 16,
+      storeId: 17,
+      name: 'LED Desk Lamp',
+      price: 39.99,
+      stock: 7,
+      rating: 4.4,
+      review: 112,
+      image:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
+      category: 'Home',
+      description: 'Adjustable LED lamp with multiple brightness levels',
+    },
+  ];
+
+
 
   const fetchProducts = useCallback(() => {
     return loading.withLoading(async () => {
@@ -72,10 +158,12 @@ export default function ProductsPage() {
   }, [loading]);
 
   useEffect(() => {
+    
+  setProducts(prev => [...(prev ?? []), ...initialProducts]);
     fetchProducts();
     const params = new URLSearchParams(location.search);
     const query = params.get('query') || '';
-    setSearchQuery(query);    
+    setSearchQuery(query);
   }, [location.search]);
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -219,7 +307,7 @@ export default function ProductsPage() {
     setSelectedCategories((prev) => prev.filter((c) => c !== category));
   };
 
-  
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
@@ -653,7 +741,7 @@ export default function ProductsPage() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                               <span className="text-lg font-bold text-amber-900">
-                                ${product.price * 9 / 10}
+                                ${(product.price * 9 / 10).toFixed(2)}
                               </span>
                               <span className="text-sm text-amber-600 line-through">
                                 ${product.price}

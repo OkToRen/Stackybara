@@ -1,17 +1,18 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Product } from '@/declarations/backend/backend.did';
 
-export type Product = {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice: number;
-  rating: number;
-  reviews: number;
-  image: string;
-  category: string;
-  description: string;
-  sellerPrincipal: string;
-};
+// export type Product = {
+//   id: number;
+//   name: string;
+//   price: number;
+//   originalPrice: number;
+//   rating: number;
+//   reviews: number;
+//   image: string;
+//   category: string;
+//   description: string;
+//   sellerPrincipal: string;
+// };
 
 interface ProductContextType{
     product: Product | null;
