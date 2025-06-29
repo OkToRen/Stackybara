@@ -25,3 +25,14 @@ type Ticket = {
     isStaff: boolean;
   }[];
 };
+
+type Feature = {
+  title: string;
+  description: string;
+  route: string;
+  icon: React.ElementType;
+  color: string;
+  image: string;
+  category: string;
+  protected?: boolean;
+};

@@ -15,6 +15,7 @@ type AuthContextType = {
   login: () => void;
   logout: () => void;
   loginLoading: boolean;
+  loginError: string;
   actor: Actor | null;
   authChecked?: boolean;
 };
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   principal: Principal.anonymous(),
   login: async () => {},
   logout: async () => {},
+  loginError: '',
   loginLoading: false,
   actor: null,
   authChecked: false,
@@ -32,11 +34,13 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const agent: AgentManager = useAgentManager();
   const { useAuth, useAuthState, useUserPrincipal } = authHooks(agent);
-  const { authenticated, login, logout, loginLoading, identity } = useAuth();
+  const { authenticated, login, logout, loginLoading, identity, loginError } =
+    useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [principal, setPrincipal] = useState<Principal>();
   const [actor, setActor] = useState<Actor | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [loginErrorResult, setLoginErrorResult] = useState<string>();
 
   // Handle login
   const handleLogin = () => {
@@ -102,6 +106,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login: handleLogin,
         logout: handleLogout,
         loginLoading,
+        loginError: loginError ?? '',
         actor,
         authChecked,
       }}
