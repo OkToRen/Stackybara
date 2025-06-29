@@ -15,7 +15,8 @@ type AuthContextType = {
   login: () => void;
   logout: () => void;
   loginLoading: boolean;
-  actor: any | null;
+  actor: Actor | null;
+  authChecked?: boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -25,16 +26,17 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
   loginLoading: false,
   actor: null,
+  authChecked: false,
 });
 
-// AuthProvider component
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const agent: AgentManager = useAgentManager();
   const { useAuth, useAuthState, useUserPrincipal } = authHooks(agent);
   const { authenticated, login, logout, loginLoading, identity } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [principal, setPrincipal] = useState<Principal>();
-  const [actor, setActor] = useState<Actor | null>(null); // Replace 'any' with your actor type
+  const [actor, setActor] = useState<Actor | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Handle login
   const handleLogin = () => {
@@ -76,6 +78,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Authentication check failed:', error);
+    } finally {
+      setAuthChecked(true);
     }
   };
 
@@ -97,8 +101,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         principal: identity ? identity.getPrincipal() : Principal.anonymous(),
         login: handleLogin,
         logout: handleLogout,
-        loginLoading: loginLoading,
+        loginLoading,
         actor,
+        authChecked,
       }}
     >
       {children}
