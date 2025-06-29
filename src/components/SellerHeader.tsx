@@ -43,10 +43,6 @@ export default function SellerHeader() {
             <Link to="/seller/profile">
                 <Store className="h-7 w-7 p-1 rounded-full text-amber-800 bg-amber-100 hover:bg-teal-100 hover:text-teal-700 transition-colors" />
             </Link>
-            <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
           </div>
         </div>
       </div>
