@@ -379,7 +379,7 @@ export default function Header() {
       )}
 
       {/* Spacer for fixed header */}
-      <div className="h-32" />
+      <div className="h-28" />
     </>
   )
 }
