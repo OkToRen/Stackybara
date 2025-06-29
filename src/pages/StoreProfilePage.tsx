@@ -5,14 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ReviewCard, type Review } from '@/components/ui/reviewcard';
-import { 
-  MapPin, 
-  Calendar, 
-  Edit3, 
-  Star, 
-  Package, 
-  Save, 
-  XCircle, 
+import {
+  MapPin,
+  Calendar,
+  Edit3,
+  Star,
+  Package,
+  Save,
+  XCircle,
   Store as StoreIcon,
   MessageSquare,
   Settings,
@@ -65,7 +65,7 @@ export default function StoreProfilePage() {
   const loading = useLoading();
   const [isEditing, setIsEditing] = useState(false);
   const [isSeller, setIsSeller] = useState(true);
-  const [storeInfo, setStoreInfo] = useState<Store | null>(null);
+  const [storeInfo, setStoreInfo] = useState<Store>();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: initialStoreInfo.name,
@@ -74,14 +74,18 @@ export default function StoreProfilePage() {
   });
 
   useEffect(() => {
-    if (storeInfo) {
-      setFormData({
-        name: storeInfo.storeName,
-        tagline: storeInfo.storeDesc,
-        location: storeInfo.storeLocation,
-      });
-    }
-  }, [storeInfo]);
+    const fetchStore = async () => {
+      console.log(auth.principal)
+      try {
+        const response = await backend.getStoreProfile(auth.principal);
+        console.log(response);
+        setStoreInfo(Array.isArray(response) ? response[0] : undefined);
+      } catch (err) {
+        console.error("Error fetching store:", err);
+      }
+    };
+    fetchStore();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -174,29 +178,29 @@ export default function StoreProfilePage() {
                     <div>
                       {isEditing ? (
                         <div className="space-y-2">
-                          <Input 
-                            name="name" 
-                            value={formData.name} 
-                            onChange={handleInputChange} 
+                          <Input
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
                             className="text-3xl font-bold border-amber-300 focus:border-teal-400"
                           />
-                          <Input 
-                            name="tagline" 
-                            value={formData.tagline} 
-                            onChange={handleInputChange} 
+                          <Input
+                            name="tagline"
+                            value={formData.tagline}
+                            onChange={handleInputChange}
                             className="border-amber-300 focus:border-teal-400"
                           />
-                          <Input 
-                            name="location" 
-                            value={formData.location} 
-                            onChange={handleInputChange} 
+                          <Input
+                            name="location"
+                            value={formData.location}
+                            onChange={handleInputChange}
                             className="border-amber-300 focus:border-teal-400"
                           />
                         </div>
                       ) : (
                         <>
                           <h1 className="text-3xl font-bold text-amber-900 mb-2">
-                            {storeInfo?.storeName || initialStoreInfo.name}
+                            {storeInfo?.storeName}
                           </h1>
                           <p className="text-amber-700 mb-2">{storeInfo?.storeDesc || initialStoreInfo.tagline}</p>
                           <div className="flex items-center gap-4 flex-wrap">
@@ -322,10 +326,10 @@ export default function StoreProfilePage() {
                   {sellerProducts.map(product => (
                     <Card key={product.id} className="border-amber-200 hover:shadow-lg transition-shadow">
                       <CardContent className="p-4">
-                        <img 
-                          src={product.image} 
-                          alt={product.name} 
-                          className="w-full h-40 object-cover rounded-lg mb-4" 
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-40 object-cover rounded-lg mb-4"
                         />
                         <h3 className="font-semibold text-amber-900 mb-2 line-clamp-2">
                           {product.name}
@@ -334,7 +338,7 @@ export default function StoreProfilePage() {
                           <span className="text-lg font-bold text-teal-600">
                             ${product.price}
                           </span>
-                          <Badge 
+                          <Badge
                             variant={product.stock > 10 ? "default" : product.stock > 0 ? "secondary" : "destructive"}
                             className="text-xs"
                           >
@@ -449,7 +453,7 @@ export default function StoreProfilePage() {
                       <div>
                         <h4 className="font-medium text-amber-900">Seller Mode</h4>
                         <p className="text-sm text-amber-700">
-                          {isSeller 
+                          {isSeller
                             ? 'You are currently in seller mode. You can manage your store and products.'
                             : 'Switch to seller mode to manage your store and sell products.'
                           }
@@ -458,11 +462,10 @@ export default function StoreProfilePage() {
                       <Button
                         onClick={handleToggleSellerMode}
                         variant="outline"
-                        className={`border-2 ${
-                          isSeller 
-                            ? 'border-teal-300 text-teal-800 bg-teal-50' 
-                            : 'border-amber-300 text-amber-800 bg-amber-50'
-                        }`}
+                        className={`border-2 ${isSeller
+                          ? 'border-teal-300 text-teal-800 bg-teal-50'
+                          : 'border-amber-300 text-amber-800 bg-amber-50'
+                          }`}
                       >
                         {isSeller ? (
                           <>
@@ -477,11 +480,11 @@ export default function StoreProfilePage() {
                         )}
                       </Button>
                     </div>
-                    
+
                     {isSeller && (
                       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="text-sm text-blue-800">
-                          <strong>Note:</strong> Switching to buyer mode will hide your store from customers temporarily. 
+                          <strong>Note:</strong> Switching to buyer mode will hide your store from customers temporarily.
                           You can switch back to seller mode at any time to reactivate your store.
                         </p>
                       </div>
@@ -523,8 +526,8 @@ export default function StoreProfilePage() {
                       <div className="text-sm text-green-700">Satisfaction Rate</div>
                     </div>
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full mt-4 border-amber-300 text-amber-800"
                   >
                     View Detailed Analytics

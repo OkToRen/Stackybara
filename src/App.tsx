@@ -20,6 +20,7 @@ import CheckoutPage from './pages/CheckOutPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import PostUserLoginPage from './pages/PostUserLoginPage';
+import PostUserToSellerPage from './pages/PostUserToSellerPage';
 import LoadingScreen from './pages/LoadingScreen';
 import ChatPage from './pages/ChatPage';
 import ScrollToTop from './hooks/UseScrollToTop';
@@ -40,6 +41,7 @@ function App() {
                 <Route path="productdetails" element={<ProductDetailsPage />} />
                 <Route path="about" element={<AboutPage />} />
                 <Route path="/postlogin" element={<PostUserLoginPage />} />
+                <Route path="/postseller" element={<PostUserToSellerPage />} />
               </Route>
 
               <Route element={<PrivateRoute />}>

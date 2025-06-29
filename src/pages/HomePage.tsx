@@ -97,6 +97,7 @@ export default function HomePage() {
       badge: 'Best Seller',
       description:
         'Premium quality wireless headphones with noise cancellation',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
     {
       id: 2,
@@ -110,6 +111,7 @@ export default function HomePage() {
       category: 'Electronics',
       badge: 'New',
       description: 'Track your fitness goals with this advanced smartwatch',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
     {
       id: 3,
@@ -123,6 +125,7 @@ export default function HomePage() {
       category: 'Office',
       badge: 'Sale',
       description: 'Adjustable aluminum laptop stand for better posture',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
     {
       id: 4,
@@ -136,6 +139,7 @@ export default function HomePage() {
       category: 'Electronics',
       badge: 'Popular',
       description: 'Waterproof speaker with 12-hour battery life',
+      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
     },
   ];
 

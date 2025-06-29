@@ -1,11 +1,8 @@
-// PostUserLoginPage.tsx
 import { useState, useEffect } from 'react';
 import { backend } from '@/declarations/backend';
 import { useAuthContext } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function PostUserLoginPage() {
   const { actor, isAuthenticated, principal } = useAuthContext();

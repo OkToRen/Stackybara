@@ -104,6 +104,7 @@ actor class Backend() {
   var users : Trie.Trie<Principal, UserData> = Trie.empty();
   stable var products : Trie.Trie<Nat32, Product> = Trie.empty();
   stable var stores : Trie.Trie<Nat32, Store> = Trie.empty();
+  stable var storesPrincipalBased : Trie.Trie<Principal, Store> = Trie.empty();
   stable var orders : Trie.Trie<Nat32, Order> = Trie.empty();
 
   stable var nextProductId : Nat32 = 1;
@@ -149,11 +150,6 @@ actor class Backend() {
   public query func getAllUsers() : async [(Principal, UserData)] {
     return Trie.toArray<Principal, UserData, (Principal, UserData)>(users, func(k : Principal, v : UserData) : (Principal, UserData) = (k, v));
   };
-
-  // public query func getStoreProfile(storeId : Nat32) : async ?Store {
-  //   let profileKey = { hash = storeId; key = storeId };
-  //   return Trie.get(stores, profileKey, Nat32.equal);
-  // };
 
   public func getUser(principal : Principal) : async ?UserData {
     let key = { hash = Principal.hash(principal); key = principal };
@@ -309,9 +305,9 @@ actor class Backend() {
   };
 
   /* STORE */
-  public query func getStoreProfile(storeId : Nat32) : async ?Store {
-    let profileKey = { hash = storeId; key = storeId };
-    return Trie.get(stores, profileKey, Nat32.equal);
+  public query func getStoreProfile(principal : Principal) : async ?Store {
+    let profileKey = { hash = Principal.hash(principal); key = principal };
+    return Trie.get(storesPrincipalBased, profileKey, Principal.equal);
   };
 
   public func updateStoreProfile(
@@ -349,38 +345,36 @@ actor class Backend() {
     newLocation : Text,
   ) : async Bool {
     let user = principal;
-
-    let allStores = Trie.toArray<Nat32, Store, Store>(
-      stores,
-      func(k : Nat32, v : Store) : Store = v,
-    );
-
-    let existingStore = Array.find<Store>(
-      allStores,
-      func(s : Store) : Bool = Principal.equal(s.owner, user),
-    );
-
-    switch (existingStore) {
-      case null {
-        let storeId = nextStoreId;
-        nextStoreId += 1;
-
-        let newStore : Store = {
-          storeId = storeId;
-          owner = user;
-          storeName = newName;
-          storeDesc = newDesc;
-          storeLocation = newLocation;
-        };
-
-        let storeKey = { hash = storeId; key = storeId };
-        let (updatedStores, _) = Trie.put(stores, storeKey, Nat32.equal, newStore);
-        stores := updatedStores;
-
-        return true;
-      };
-      case (?_) { return false; }; 
+    let key : Trie.Key<Principal> = {
+      hash = Principal.hash(user);
+      key = user;
     };
+
+    let storeId = nextStoreId;
+
+    let newStore : Store = {
+      storeId = storeId;
+      owner = user;
+      storeName = newName;
+      storeDesc = newDesc;
+      storeLocation = newLocation;
+    };
+    if (Trie.get(storesPrincipalBased, key, Principal.equal) == null) {
+      let (updatedPrincipalStores, _) = Trie.put(storesPrincipalBased, key, Principal.equal, newStore);
+      storesPrincipalBased := updatedPrincipalStores;
+
+      let storeKey : Trie.Key<Nat32> = {
+        hash = storeId;
+        key = storeId;
+      };
+
+      let (updatedStores, _) = Trie.put(stores, storeKey, Nat32.equal, newStore);
+      stores := updatedStores;
+      nextStoreId += 1;
+    };
+
+    Debug.print("store binded at backend");
+    return true;
   };
 
   // --- CHAT FUNCTIONS ---

@@ -37,7 +37,7 @@ export default function ProfilePage() {
     return loading.withLoading(async () => {
       console.log(auth.principal);
       const response = await backend.getUser(auth.principal);
-      console.log(response);
+      console.log(Array.isArray(response));
       setUserInfo(Array.isArray(response) ? response[0] : undefined);
     });
   }, [loading]);
@@ -55,14 +55,14 @@ export default function ProfilePage() {
   //   console.log('registering user finished');
   // };
 
-    const handleBecomeSeller = async () => {
+  const handleBecomeSeller = async () => {
     if (userInfo) {
-      const updatedUserData = { ...userInfo, isSeller: true }; 
+      const updatedUserData = { ...userInfo, isSeller: true };
       await loading.withLoading(async () => {
         await backend.updateUser(auth.principal, updatedUserData);
         setUserInfo(updatedUserData);
         console.log('User updated to seller:', updatedUserData);
-        navigate('/seller/profile');
+        navigate('/postseller');
       });
     } else {
       console.warn('No user info available to update.');
@@ -166,7 +166,7 @@ export default function ProfilePage() {
   };
 
   if (loading.isLoading) {
-    return <StackybaraLoadingPage />;
+    return //<StackybaraLoadingPage />;
   }
 
   return (
@@ -600,18 +600,18 @@ export default function ProfilePage() {
               </Card>
 
               <Card className="border-amber-200">
-              <CardHeader>
-                <CardTitle className="text-amber-900">Change to Seller</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button
-                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
-                  onClick={handleBecomeSeller}
-                >
-                  Become a Seller
-                </Button>
-              </CardContent>
-            </Card>
+                <CardHeader>
+                  <CardTitle className="text-amber-900">Change to Seller</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button
+                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                    onClick={handleBecomeSeller}
+                  >
+                    Become a Seller
+                  </Button>
+                </CardContent>
+              </Card>
 
               {/* <Card className="border-amber-200">
                 <CardHeader>
@@ -631,6 +631,7 @@ export default function ProfilePage() {
             </div>
           </TabsContent>
         </Tabs>
+
         <Button
           onClick={handleLogoutClick}
           className="w-full text-white bg-red-500 hover:bg-red-600 mt-4"
