@@ -33,8 +33,6 @@ import { Store, UserData } from '@/declarations/backend/backend.did';
 import { Product } from '@/declarations/backend/backend.did';
 
 const initialStoreInfo = {
-  name: "The Capy Store",
-  tagline: "Home of the finest digital goods",
   bannerUrl: "https://images.unsplash.com/photo-1554034483-04fda0d3507b?w=800&h=200&fit=crop",
   logoUrl: Logo,
   location: "Jakarta, Indonesia",
@@ -43,7 +41,7 @@ const initialStoreInfo = {
   totalSales: 142,
   totalRevenue: 3247.50,
   rating: 4.8,
-  totalReviews: 87
+  totalReviews: 4
 };
 
 
@@ -64,6 +62,7 @@ export default function StoreProfilePage() {
   const [storeInfo, setStoreInfo] = useState<Store>();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<Store>();
+
   const fetchStore = useCallback(() => {
     return loading.withLoading(async () => {
       console.log(auth.principal)
@@ -101,8 +100,9 @@ export default function StoreProfilePage() {
     });
   }, [loading]);
 
-  useEffect(() => {
 
+
+  useEffect(() => {
     fetchStore();
     fetchStoreProducts();
   }, []);
@@ -166,7 +166,7 @@ export default function StoreProfilePage() {
   };
 
   if (loading.isLoading) {
-    return <StackybaraLoadingPage />;
+    return (<StackybaraLoadingPage />)
   }
 
   return (
@@ -181,7 +181,7 @@ export default function StoreProfilePage() {
                 <div className="relative">
                   <div className="w-32 h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
                     <Avatar className="w-full h-full">
-                      <AvatarImage src={storeInfo?.storeDesc || initialStoreInfo.logoUrl} alt={`${storeInfo?.storeName || initialStoreInfo.name} logo`} />
+                      <AvatarImage src={storeInfo?.storeDesc || initialStoreInfo.logoUrl} alt={`${storeInfo?.storeName} logo`} />
                       <AvatarFallback className="text-2xl text-amber-600">
                         <StoreIcon className="h-16 w-16" />
                       </AvatarFallback>
@@ -224,7 +224,7 @@ export default function StoreProfilePage() {
                           <h1 className="text-3xl font-bold text-amber-900 mb-2">
                             {storeInfo?.storeName}
                           </h1>
-                          <p className="text-amber-700 mb-2">{storeInfo?.storeDesc || initialStoreInfo.tagline}</p>
+                          <p className="text-amber-700 mb-2">{storeInfo?.storeDesc}</p>
                           <div className="flex items-center gap-4 flex-wrap">
                             <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white">
                               <Star className="h-3 w-3 mr-1" />
@@ -366,14 +366,6 @@ export default function StoreProfilePage() {
                           >
                             {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                           </Badge>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="flex-1 border-amber-300 text-amber-800">
-                            Edit
-                          </Button>
-                          <Button size="sm" className="flex-1 bg-teal-500 hover:bg-teal-600 text-white">
-                            View
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>

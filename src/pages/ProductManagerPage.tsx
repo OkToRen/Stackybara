@@ -9,6 +9,7 @@ import { useAuthContext } from '@/lib/AuthContext';
 import { Store } from '@/declarations/backend/backend.did';
 import { useLoading } from '@/hooks/UseLoading';
 import { Product } from '@/declarations/backend/backend.did';
+import StackybaraLoadingPage from './LoadingScreen';
 
 type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc';
 type StockFilter = 'all' | 'in-stock' | 'out-of-stock' | 'low-stock';
@@ -35,6 +36,7 @@ export default function ProductManagerPage() {
   // Form states
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
   const [price, setPrice] = useState(Number);
   const [stock, setStock] = useState(Number);
   const [image, setImage] = useState<File | null>(null);
@@ -184,6 +186,7 @@ export default function ProductManagerPage() {
   const clearForm = () => {
     setName('');
     setDescription('');
+    setCategory('');
     setPrice(0);
     setStock(0);
     setImage(null);
@@ -205,6 +208,7 @@ export default function ProductManagerPage() {
     setPrice(0);
     setStock(0);
     setDescription('');
+    setCategory('');
     setImage(null);
     setImagePreview(product.image);
     setView('form');
@@ -239,9 +243,25 @@ export default function ProductManagerPage() {
       console.log('Adding new product:', { name, description, imagePreview, price, stock });
 
       // backend product
-      let id = await getStoreId();
-      if (id != undefined && imagePreview !== null) {
-        backend.createProduct(auth.principal, id, name, description, imagePreview, price, stock)
+      let storeId = await getStoreId();
+      let productId = await backend.getLatestProductId();
+      let rating = 0;
+      let review  = 0;
+      if (storeId != undefined && imagePreview !== null) {
+        await backend.createProduct(auth.principal, storeId, name, description, category, rating, review, imagePreview, price, stock);
+        const newProduct: Product = {
+          productId, // atau pakai dummy ID dari backend kalau ada
+          storeId,
+          name,
+          description,
+          category,
+          rating,
+          review,
+          image: imagePreview,
+          price,
+          stock
+        };
+        setSellerProducts(prev => [...(prev || []), newProduct]);
       }
     }
     handleShowListView();
@@ -253,7 +273,12 @@ export default function ProductManagerPage() {
     setDeletingProduct(null);
   };
 
+  if (loading.isLoading) {
+    return (<StackybaraLoadingPage />)
+  }
+
   return (
+
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 p-8">
       <div className="container mx-auto">
 
@@ -493,6 +518,10 @@ export default function ProductManagerPage() {
                 <div className="space-y-2">
                   <label htmlFor="description" className="font-medium text-amber-800">Description</label>
                   <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="category" className="font-medium text-amber-800">Category</label>
+                  <Input id="category" value={category} onChange={(e) => setCategory(e.target.value)} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">

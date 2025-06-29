@@ -1,5 +1,5 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
 import { useState, useMemo } from 'react';
 import { useProduct } from '@/lib/ProductContext';
 import {
@@ -34,10 +34,14 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useDebounce } from '@/hooks/UseDebounce';
 import { useAuthContext } from '@/lib/AuthContext';
+import { backend } from '@/declarations/backend';
+import { Product } from '@/declarations/backend/backend.did';
+import { useLoading } from '@/hooks/UseLoading';
 
 export default function ProductsPage() {
   const location = useLocation();
-  const { product, setProduct } = useProduct();
+  const [product, setProduct] = useState<Product>();
+  const [products, setProducts] = useState<Product[]>();
   const [viewMode, setViewMode] = useState('grid');
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -48,11 +52,30 @@ export default function ProductsPage() {
   const [cartMessage, setCartMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const auth = useAuthContext();
+  const loading = useLoading();
+
+  const fetchProducts = useCallback(() => {
+    return loading.withLoading(async () => {
+      console.log(auth.principal)
+      try {
+        const response = await backend.getAllProducts();
+        console.log(response);
+        const products = Array.isArray(response) ? response : undefined;
+        console.log(products);
+        if (products != undefined && Array.isArray(products)) {
+          setProducts(products as Product[]);
+        }
+      } catch (err) {
+        console.error("Error fetching store:", err);
+      }
+    })
+  }, [loading]);
 
   useEffect(() => {
+    fetchProducts();
     const params = new URLSearchParams(location.search);
     const query = params.get('query') || '';
-    setSearchQuery(query);
+    setSearchQuery(query);    
   }, [location.search]);
 
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -63,93 +86,6 @@ export default function ProductsPage() {
     navigate('/postlogin');
   };
 
-  const products = [
-    {
-      id: 1,
-      name: 'Wireless Bluetooth Headphones',
-      price: 89.99,
-      originalPrice: 129.99,
-      rating: 4.8,
-      reviews: 324,
-      image:
-        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop',
-      category: 'Electronics',
-      badge: 'Best Seller',
-      description:
-        'Premium quality wireless headphones with noise cancellation',
-      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae', // Example principal
-    },
-    {
-      id: 2,
-      name: 'Smart Fitness Watch',
-      price: 199.99,
-      originalPrice: 249.99,
-      rating: 4.6,
-      reviews: 156,
-      image:
-        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
-      category: 'Electronics',
-      badge: 'New',
-      description: 'Track your fitness goals with this advanced smartwatch',
-      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-    },
-    {
-      id: 3,
-      name: 'Ergonomic Laptop Stand',
-      price: 45.99,
-      originalPrice: 59.99,
-      rating: 4.9,
-      reviews: 89,
-      image:
-        'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop',
-      category: 'Office',
-      badge: 'Sale',
-      description: 'Adjustable aluminum laptop stand for better posture',
-      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-    },
-    {
-      id: 4,
-      name: 'Portable Bluetooth Speaker',
-      price: 79.99,
-      originalPrice: 99.99,
-      rating: 4.7,
-      reviews: 203,
-      image:
-        'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=200&h=200&fit=crop',
-      category: 'Electronics',
-      badge: 'Popular',
-      description: 'Waterproof speaker with 12-hour battery life',
-      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-    },
-    {
-      id: 5,
-      name: 'Organic Cotton T-Shirt',
-      price: 24.99,
-      originalPrice: 34.99,
-      rating: 4.5,
-      reviews: 78,
-      image:
-        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop',
-      category: 'Fashion',
-      badge: 'Eco-Friendly',
-      description: 'Sustainable fashion made from 100% organic cotton',
-      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-    },
-    {
-      id: 6,
-      name: 'LED Desk Lamp',
-      price: 39.99,
-      originalPrice: 49.99,
-      rating: 4.4,
-      reviews: 112,
-      image:
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
-      category: 'Home',
-      badge: 'Energy Efficient',
-      description: 'Adjustable LED lamp with multiple brightness levels',
-      sellerPrincipal: 'oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae',
-    },
-  ];
 
   const categories = [
     'All',
@@ -162,7 +98,7 @@ export default function ProductsPage() {
 
   // Filter products based on all criteria
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return products?.filter((product) => {
       // Filter by search query
       const matchesSearch =
         product.name
@@ -200,7 +136,7 @@ export default function ProductsPage() {
 
   // Sort products based on sortOption
   const sortedProducts = useMemo(() => {
-    let sorted = [...filteredProducts];
+    let sorted = [...filteredProducts ?? []];
     switch (sortOption) {
       case 'price-low':
         sorted.sort((a, b) => a.price - b.price);
@@ -212,7 +148,7 @@ export default function ProductsPage() {
         sorted.sort((a, b) => b.rating - a.rating);
         break;
       case 'newest':
-        sorted.sort((a, b) => b.id - a.id);
+        sorted.sort((a, b) => b.productId - a.productId);
         break;
       default:
         // 'featured' or unknown: no sorting or default order
@@ -247,21 +183,21 @@ export default function ProductsPage() {
   };
 
   // Add to cart handler
-  const handleAddToCart = (product: (typeof products)[0]) => {
-    if (auth.isAuthenticated) {
-      addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-      });
-      setCartMessage(`${product.name} added to cart!`);
-      setTimeout(() => setCartMessage(null), 2000);
-    }
-    else {
-      handleLogin();
-    }
-  };
+  // const handleAddToCart = (product?: (typeof products)) => {
+  //   if (auth.isAuthenticated) {
+  //     addToCart({
+  //       id: produc,
+  //       name: product.name,
+  //       price: product.price,
+  //       image: product.image,
+  //     });
+  //     setCartMessage(`${product.name} added to cart!`);
+  //     setTimeout(() => setCartMessage(null), 2000);
+  //   }
+  //   else {
+  //     handleLogin();
+  //   }
+  // };
 
   const hasActiveFilters =
     selectedCategories.length > 0 ||
@@ -282,6 +218,9 @@ export default function ProductsPage() {
   const removeCategory = (category: string) => {
     setSelectedCategories((prev) => prev.filter((c) => c !== category));
   };
+
+  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <div className="container mx-auto px-4 py-8">
@@ -665,14 +604,14 @@ export default function ProductsPage() {
               }
             >
               {sortedProducts.map((product) => {
-                const cartItem = cart.find((item) => item.id === product.id);
+                const cartItem = cart.find((item) => item.id === product.productId);
                 return (
                   <Link
                     to="/productdetails"
                     onClick={() => setProduct(product)}
                   >
                     <Card
-                      key={product.id}
+                      key={product.productId}
                       className={`border-amber-200 hover:shadow-lg transition-shadow group ${viewMode === 'list' ? 'flex flex-row' : ''}`}
                     >
                       <div
@@ -687,9 +626,6 @@ export default function ProductsPage() {
                               alt={product.name}
                               className={`object-cover ${viewMode === 'list' ? 'w-full h-32 rounded-l-lg' : 'w-full h-48 rounded-t-lg'}`}
                             />
-                            <Badge className="absolute top-2 left-2 bg-teal-500 text-white text-xs">
-                              {product.badge}
-                            </Badge>
                           </div>
                         </CardHeader>
                       </div>
@@ -710,17 +646,17 @@ export default function ProductsPage() {
                                 {product.rating}
                               </span>
                               <span className="text-sm text-amber-600 ml-1">
-                                ({product.reviews})
+                                ({product.review})
                               </span>
                             </div>
                           </div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
                               <span className="text-lg font-bold text-amber-900">
-                                ${product.price}
+                                ${product.price * 9 / 10}
                               </span>
                               <span className="text-sm text-amber-600 line-through">
-                                ${product.originalPrice}
+                                ${product.price}
                               </span>
                             </div>
                             <Badge
@@ -740,7 +676,7 @@ export default function ProductsPage() {
                                 className="h-8 w-8 p-0 hover:bg-amber-100"
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  decreaseFromCart(product.id);
+                                  decreaseFromCart(product.productId);
                                 }}
                               >
                                 -
@@ -755,7 +691,7 @@ export default function ProductsPage() {
                                 onClick={(e) => {
                                   e.preventDefault();
                                   addToCart({
-                                    id: product.id,
+                                    id: product.productId,
                                     name: product.name,
                                     price: product.price,
                                     image: product.image,
@@ -766,7 +702,7 @@ export default function ProductsPage() {
                               </Button>
                               <Button
                                 className="flex-1 bg-teal-500 hover:bg-teal-600 text-white"
-                                onClick={() => handleAddToCart(product)}
+                              // onClick={() => handleAddToCart(product)}
                               >
                                 <ShoppingCart className="h-4 w-4 mr-2" />
                                 Add More
@@ -775,10 +711,10 @@ export default function ProductsPage() {
                           ) : (
                             <Button
                               className="w-full bg-teal-500 hover:bg-teal-600 text-white"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleAddToCart(product);
-                              }}
+                            // onClick={(e) => {
+                            //   e.preventDefault();
+                            //   handleAddToCart(product);
+                            // }}
                             >
                               <ShoppingCart className="h-4 w-4 mr-2" />
                               Add to Cart

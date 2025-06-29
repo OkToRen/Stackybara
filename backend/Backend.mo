@@ -40,6 +40,9 @@ actor class Backend() {
     storeId : Nat32;
     name : Text;
     description : Text;
+    category : Text;
+    rating : Nat32;
+    review : Nat32;
     image : Text;
     price : Nat32;
     stock : Nat32;
@@ -117,7 +120,7 @@ actor class Backend() {
     address : Text,
     phone : Text,
     isSeller : Bool,
-    principal : Principal
+    principal : Principal,
   ) : async Text {
     let user = principal;
     let key : Trie.Key<Principal> = {
@@ -194,6 +197,9 @@ actor class Backend() {
     storeId : Nat32,
     name : Text,
     description : Text,
+    category : Text,
+    rating : Nat32,
+    review : Nat32,
     image : Text,
     price : Nat32,
     stock : Nat32,
@@ -213,6 +219,9 @@ actor class Backend() {
       storeId = storeId;
       name = name;
       description = description;
+      category = category;
+      rating = rating;
+      review = review;
       image = image;
       price = price;
       stock = stock;
@@ -223,6 +232,10 @@ actor class Backend() {
     products := updatedProducts;
 
     nextProductId += 1;
+  };
+
+  public func getLatestProductId() : async (Nat32) {
+    return nextProductId;
   };
 
   public func getMyProducts(principal : Principal, storeId : Nat32) : async [Product] {
@@ -238,7 +251,19 @@ actor class Backend() {
     Array.filter<Product>(allProducts, func(product : Product) : Bool = Nat32.equal(product.storeId, storeId));
   };
 
-  public func updateProduct(principal : Principal, storeId : Nat32, productId : Nat32, newName : Text, newDesc : Text, newImage : Text, newPrice : Nat32, newStock : Nat32) : async Bool {
+  public func updateProduct(
+    principal : Principal,
+    storeId : Nat32,
+    productId : Nat32,
+    newName : Text,
+    newDesc : Text,
+    newCategory : Text,
+    newRating : Nat32,
+    newReview : Nat32,
+    newImage : Text,
+    newPrice : Nat32,
+    newStock : Nat32,
+  ) : async Bool {
     let user = principal;
     let storeKey = { key = storeId; hash = storeId };
     switch (Trie.get(stores, storeKey, Nat32.equal)) {
@@ -259,6 +284,9 @@ actor class Backend() {
             storeId = storeId;
             name = newName;
             description = newDesc;
+            category = newCategory;
+            rating = newRating;
+            review = newReview;
             image = newImage;
             price = newPrice;
             stock = newStock;
@@ -299,6 +327,14 @@ actor class Backend() {
     };
   };
 
+  public func getAllProducts() : async [Product] {
+    Trie.toArray<Nat32, Product, Product>(
+      products,
+      func(k : Nat32, v : Product) : Product = v,
+    );
+  };
+
+  /* ORDER */
   public func getMyOrders(userPrincipal : Principal) : async [Order] {
     let allOrders = Trie.toArray<Nat32, Order, Order>(orders, func(k : Nat32, v : Order) : Order = v);
     Array.filter<Order>(allOrders, func(order : Order) : Bool = Principal.equal(order.buyer, userPrincipal));
@@ -378,12 +414,12 @@ actor class Backend() {
   };
 
   // --- CHAT FUNCTIONS ---
-  public func createOrGetChat(user1: Principal, user2: Principal) : async Chat {
+  public func createOrGetChat(user1 : Principal, user2 : Principal) : async Chat {
     // Try to find existing chat
-    let allChats = Trie.toArray<Nat32, Chat, Chat>(chats, func (k, v) = v);
-    let found = Array.find<Chat>(allChats, func (c) = (c.user1 == user1 and c.user2 == user2) or (c.user1 == user2 and c.user2 == user1));
+    let allChats = Trie.toArray<Nat32, Chat, Chat>(chats, func(k, v) = v);
+    let found = Array.find<Chat>(allChats, func(c) = (c.user1 == user1 and c.user2 == user2) or (c.user1 == user2 and c.user2 == user1));
     switch (found) {
-      case (?chat) { return chat; };
+      case (?chat) { return chat };
       case null {
         let chatId = nextChatId;
         nextChatId += 1;
@@ -397,11 +433,11 @@ actor class Backend() {
         let (updatedChats, _) = Trie.put(chats, key, Nat32.equal, newChat);
         chats := updatedChats;
         return newChat;
-      }
-    }
+      };
+    };
   };
 
-  public func sendMessage(user1: Principal, user2: Principal, content: Text) : async ?Message {
+  public func sendMessage(user1 : Principal, user2 : Principal, content : Text) : async ?Message {
     let chat = await createOrGetChat(user1, user2);
     let messageId = nextMessageId;
     nextMessageId += 1;
@@ -427,40 +463,48 @@ actor class Backend() {
     return ?message;
   };
 
-  public query func getMessages(user1: Principal, user2: Principal) : async [MessageResponse] {
-    let allChats = Trie.toArray<Nat32, Chat, Chat>(chats, func (k, v) = v);
-    let found = Array.find<Chat>(allChats, func (c) = (c.user1 == user1 and c.user2 == user2) or (c.user1 == user2 and c.user2 == user1));
+  public query func getMessages(user1 : Principal, user2 : Principal) : async [MessageResponse] {
+    let allChats = Trie.toArray<Nat32, Chat, Chat>(chats, func(k, v) = v);
+    let found = Array.find<Chat>(allChats, func(c) = (c.user1 == user1 and c.user2 == user2) or (c.user1 == user2 and c.user2 == user1));
     switch (found) {
-      case null { return []; };
+      case null { return [] };
       case (?chat) {
-        let msgs = Array.map<Nat32, MessageResponse>(chat.messages, func (mid) {
-          let key = { hash = mid; key = mid };
-          switch (Trie.get(chatMessages, key, Nat32.equal)) {
-            case (?m) {
-              // Fetch sender name from users Trie
-              let senderKey = { hash = Principal.hash(m.sender); key = m.sender };
-              let senderName = switch (Trie.get(users, senderKey, Principal.equal)) {
-                case (?user) { user.name };
-                case null { Principal.toText(m.sender) };
+        let msgs = Array.map<Nat32, MessageResponse>(
+          chat.messages,
+          func(mid) {
+            let key = { hash = mid; key = mid };
+            switch (Trie.get(chatMessages, key, Nat32.equal)) {
+              case (?m) {
+                // Fetch sender name from users Trie
+                let senderKey = {
+                  hash = Principal.hash(m.sender);
+                  key = m.sender;
+                };
+                let senderName = switch (Trie.get(users, senderKey, Principal.equal)) {
+                  case (?user) { user.name };
+                  case null { Principal.toText(m.sender) };
+                };
+                {
+                  message = m;
+                  name = senderName;
+                };
               };
-              {
-                message = m;
-                name = senderName;
-              }
+              case null {
+                {
+                  message = {
+                    id = mid;
+                    content = "[deleted]";
+                    sender = Principal.fromText("");
+                    timestamp = 0;
+                  };
+                  name = "[deleted]";
+                };
+              };
             };
-            case null { {
-              message = {
-                id = mid;
-                content = "[deleted]";
-                sender = Principal.fromText("");
-                timestamp = 0;
-              };
-              name = "[deleted]";
-            }}
-          }
-        });
+          },
+        );
         return msgs;
-      }
-    }
+      };
+    };
   };
 };
