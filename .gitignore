@@ -36,3 +36,21 @@ dist-ssr
 .env.development
 .env.test
 .env.production
+
+# 🐍 Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# 🧪 Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# 📦 Dependency files
+*.egg-info/
+*.egg
+dist/
+build/
