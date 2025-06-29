@@ -24,12 +24,13 @@ import {
 } from 'lucide-react';
 import { useAuthContext } from '@/lib/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLoading } from '@/hooks/UseLoading';
 import StackybaraLoadingPage from '@/pages/LoadingScreen';
 import Logo from '@/assets/logo.png';
 import { backend } from '@/declarations/backend';
 import { Store, UserData } from '@/declarations/backend/backend.did';
+import { Product } from '@/declarations/backend/backend.did';
 
 const initialStoreInfo = {
   name: "The Capy Store",
@@ -45,13 +46,7 @@ const initialStoreInfo = {
   totalReviews: 87
 };
 
-const sellerProducts = [
-  { id: 1, name: 'Wireless Bluetooth Headphones', price: 89.99, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop', stock: 15 },
-  { id: 2, name: 'Organic Cotton T-Shirt', price: 24.99, image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop', stock: 32 },
-  { id: 3, name: 'Smartphone Case', price: 15.99, image: 'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=200&h=200&fit=crop', stock: 8 },
-  { id: 4, name: 'USB-C Cable', price: 12.99, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop', stock: 25 },
-  { id: 5, name: 'Portable Charger', price: 34.99, image: 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=200&h=200&fit=crop', stock: 12 },
-];
+
 
 const reviews: Review[] = [
   { id: 1, customerName: 'John Doe', rating: 5, comment: 'Amazing product, fast delivery! Highly recommended.', date: 'June 20, 2025' },
@@ -63,18 +58,14 @@ const reviews: Review[] = [
 export default function StoreProfilePage() {
   const auth = useAuthContext();
   const loading = useLoading();
+  const [sellerProducts, setSellerProducts] = useState<Product[]>();
   const [isEditing, setIsEditing] = useState(false);
   const [isSeller, setIsSeller] = useState(true);
   const [storeInfo, setStoreInfo] = useState<Store>();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: initialStoreInfo.name,
-    tagline: initialStoreInfo.tagline,
-    location: initialStoreInfo.location,
-  });
-
-  useEffect(() => {
-    const fetchStore = async () => {
+  const [formData, setFormData] = useState<Store>();
+  const fetchStore = useCallback(() => {
+    return loading.withLoading(async () => {
       console.log(auth.principal)
       try {
         const response = await backend.getStoreProfile(auth.principal);
@@ -83,31 +74,60 @@ export default function StoreProfilePage() {
       } catch (err) {
         console.error("Error fetching store:", err);
       }
-    };
+    })
+  }, [loading]);
+
+  const getStoreId = async (): Promise<number | undefined> => {
+    const response = await backend.getStoreProfile(auth.principal);
+    const store = Array.isArray(response) ? response[0] : undefined;
+    setStoreInfo(store);
+    return store?.storeId;
+  }
+
+  const fetchStoreProducts = useCallback(() => {
+    return loading.withLoading(async () => {
+      let id = await getStoreId();
+      if (id != undefined) {
+        const response = await backend.getMyProducts(auth.principal, id)
+        const products = Array.isArray(response) ? response : undefined;
+        console.log(products)
+        if (products != undefined && Array.isArray(products)) {
+          setSellerProducts(products as Product[])
+        }
+      }
+      else {
+        console.log('fail fetch products');
+      }
+    });
+  }, [loading]);
+
+  useEffect(() => {
+
     fetchStore();
+    fetchStoreProducts();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    //setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSaveChanges = async () => {
-    if (storeInfo) {
+    if (storeInfo && formData) {
       await loading.withLoading(async () => {
         const success = await backend.updateStoreProfile(
           auth.principal,
           storeInfo.storeId,
-          formData.name,
-          formData.tagline,
-          formData.location
+          formData.storeName,
+          formData.storeDesc,
+          formData.storeLocation
         );
         if (success) {
           setStoreInfo(prev => ({
             ...prev!,
-            storeName: formData.name,
-            storeDesc: formData.tagline,
-            storeLocation: formData.location,
+            storeName: formData.storeName,
+            storeDesc: formData.storeDesc,
+            storeLocation: formData.storeLocation,
           } as Store));
           setIsEditing(false);
           console.log('Store profile updated:', storeInfo);
@@ -121,9 +141,11 @@ export default function StoreProfilePage() {
   const handleCancel = () => {
     if (storeInfo) {
       setFormData({
-        name: storeInfo.storeName,
-        tagline: storeInfo.storeDesc,
-        location: storeInfo.storeLocation,
+        owner: auth.principal,
+        storeId: storeInfo.storeId,
+        storeName: storeInfo.storeName,
+        storeDesc: storeInfo.storeDesc,
+        storeLocation: storeInfo.storeLocation
       });
     }
     setIsEditing(false);
@@ -180,19 +202,19 @@ export default function StoreProfilePage() {
                         <div className="space-y-2">
                           <Input
                             name="name"
-                            value={formData.name}
+                            value={formData?.storeName}
                             onChange={handleInputChange}
                             className="text-3xl font-bold border-amber-300 focus:border-teal-400"
                           />
                           <Input
                             name="tagline"
-                            value={formData.tagline}
+                            value={formData?.storeDesc}
                             onChange={handleInputChange}
                             className="border-amber-300 focus:border-teal-400"
                           />
                           <Input
                             name="location"
-                            value={formData.location}
+                            value={formData?.storeLocation}
                             onChange={handleInputChange}
                             className="border-amber-300 focus:border-teal-400"
                           />
@@ -259,7 +281,7 @@ export default function StoreProfilePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
                 <div className="text-center p-4 bg-amber-50 rounded-lg">
                   <div className="text-2xl font-bold text-amber-900">
-                    {sellerProducts.length}
+                    {sellerProducts?.length}
                   </div>
                   <div className="text-amber-700">Products</div>
                 </div>
@@ -323,8 +345,8 @@ export default function StoreProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {sellerProducts.map(product => (
-                    <Card key={product.id} className="border-amber-200 hover:shadow-lg transition-shadow">
+                  {sellerProducts?.map(product => (
+                    <Card key={product.productId} className="border-amber-200 hover:shadow-lg transition-shadow">
                       <CardContent className="p-4">
                         <img
                           src={product.image}
@@ -358,9 +380,11 @@ export default function StoreProfilePage() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <Button className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white">
-                    Add New Product
-                  </Button>
+                  <Link to={'/seller/productmanager'}>
+                    <Button className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white">
+                      Add New Product
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

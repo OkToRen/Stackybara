@@ -1,75 +1,29 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, PlusCircle, ArrowLeft, UploadCloud, X, Inbox, Pencil, Trash2, Filter, SlidersHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  stock: number;
-  image: string;
-};
+import { backend } from '@/declarations/backend';
+import { useAuthContext } from '@/lib/AuthContext';
+import { Store } from '@/declarations/backend/backend.did';
+import { useLoading } from '@/hooks/UseLoading';
+import { Product } from '@/declarations/backend/backend.did';
 
 type SortOption = 'name-asc' | 'name-desc' | 'price-asc' | 'price-desc' | 'stock-asc' | 'stock-desc';
 type StockFilter = 'all' | 'in-stock' | 'out-of-stock' | 'low-stock';
 
-const initialSellerProducts: Product[] = [
-  {
-    id: 1,
-    name: 'Wireless Bluetooth Headphones',
-    price: 89.99,
-    stock: 50,
-    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Headphones'
-  },
-  {
-    id: 2,
-    name: 'Organic Cotton T-Shirt',
-    price: 24.99,
-    stock: 120,
-    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=T-Shirt'
-  },
-  {
-    id: 3,
-    name: 'Ergonomic Laptop Stand',
-    price: 45.99,
-    stock: 0,
-    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Stand'
-  },
-  {
-    id: 4,
-    name: 'Washing Machine',
-    price: 499.99,
-    stock: 15,
-    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Washer'
-  },
-  {
-    id: 5,
-    name: 'Windows 11 Pro Key',
-    price: 129.99,
-    stock: 200,
-    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Windows'
-  },
-  {
-    id: 6,
-    name: 'Smartphone Case',
-    price: 15.99,
-    stock: 3,
-    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Case'
-  },
-  {
-    id: 7,
-    name: 'Gaming Mouse',
-    price: 75.50,
-    stock: 0,
-    image: 'https://placehold.co/200x200/a7f3d0/1e293b?text=Mouse'
-  }
-];
+
+// const getStoreId = async (): Promise<number | undefined> => {
+//   const response = await backend.getStoreProfile(auth.principal);
+//   const store = Array.isArray(response) ? response[0] : undefined;
+//   setStore(store);
+//   return store?.storeId;
+// }
+
 
 export default function ProductManagerPage() {
-  const [sellerProducts, setSellerProducts] = useState(initialSellerProducts);
+  const [sellerProducts, setSellerProducts] = useState<Product[] | undefined>();
   const [view, setView] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name-asc');
@@ -77,23 +31,61 @@ export default function ProductManagerPage() {
   const [priceRangeMin, setPriceRangeMin] = useState('');
   const [priceRangeMax, setPriceRangeMax] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Form states
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [stock, setStock] = useState('');
+  const [price, setPrice] = useState(Number);
+  const [stock, setStock] = useState(Number);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [store, setStore] = useState<Store>();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
+  const auth = useAuthContext();
+  const loading = useLoading();
+
+  useEffect(() => {
+    if (auth?.principal) {
+      fetchStoreProducts();
+    }
+  }, [auth?.principal]);
+
+  const getStoreId = async (): Promise<number | undefined> => {
+    const response = await backend.getStoreProfile(auth.principal);
+    const store = Array.isArray(response) ? response[0] : undefined;
+    setStore(store);
+    return store?.storeId;
+  }
+
+  const fetchStoreProducts = useCallback(() => {
+    return loading.withLoading(async () => {
+      let id = await getStoreId();
+      if (id != undefined) {
+        const response = await backend.getMyProducts(auth.principal, id)
+        const products = Array.isArray(response) ? response : undefined;
+        console.log(products)
+        if (products != undefined && Array.isArray(products)) {
+          setSellerProducts(products as Product[])
+        }
+      }
+      else {
+        console.log('fail fetch products');
+      }
+    });
+  }, [loading]);
+
+
+
+
+
   // Filter and sort products
   const getFilteredAndSortedProducts = () => {
-    let filtered = sellerProducts.filter(product => {
+    let filtered = sellerProducts?.filter(product => {
       // Text search
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       // Stock filter
       let matchesStock = true;
       switch (stockFilter) {
@@ -109,17 +101,17 @@ export default function ProductManagerPage() {
         default:
           matchesStock = true;
       }
-      
+
       // Price range filter
       const minPrice = priceRangeMin ? parseFloat(priceRangeMin) : 0;
       const maxPrice = priceRangeMax ? parseFloat(priceRangeMax) : Infinity;
       const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
-      
+
       return matchesSearch && matchesStock && matchesPrice;
     });
 
     // Sort products
-    filtered.sort((a, b) => {
+    filtered?.sort((a, b) => {
       switch (sortBy) {
         case 'name-asc':
           return a.name.localeCompare(b.name);
@@ -172,19 +164,28 @@ export default function ProductManagerPage() {
     return `${stock} in stock`;
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const toBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setImage(file);
-      setImagePreview(URL.createObjectURL(file));
+      const base64String = await toBase64(file)
+      setImagePreview(base64String);
     }
   };
 
   const clearForm = () => {
     setName('');
     setDescription('');
-    setPrice('');
-    setStock('');
+    setPrice(0);
+    setStock(0);
     setImage(null);
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
@@ -201,8 +202,8 @@ export default function ProductManagerPage() {
   const handleShowEditForm = (product: Product) => {
     setEditingProduct(product);
     setName(product.name);
-    setPrice(product.price.toString());
-    setStock(product.stock.toString());
+    setPrice(0);
+    setStock(0);
     setDescription('');
     setImage(null);
     setImagePreview(product.image);
@@ -214,18 +215,19 @@ export default function ProductManagerPage() {
     setView('list');
   };
 
-  const handleSubmit = () => {
+
+  const handleSubmit = async () => {
     if (!name || !price || !stock) {
       alert('Please fill out all fields.');
       return;
     }
-    
+
     if (editingProduct) {
-      console.log('Updating product:', { id: editingProduct.id, name, description, price, stock, newImage: image?.name });
-      setSellerProducts(prevProducts => 
-        prevProducts.map(p => 
-          p.id === editingProduct.id 
-            ? { ...p, name, price: parseFloat(price), stock: parseInt(stock), image: imagePreview || p.image } 
+      console.log('Updating product:', { id: editingProduct.productId, name, description, price, stock, newImage: image?.name });
+      setSellerProducts(prevProducts =>
+        prevProducts?.map(p =>
+          p.productId === editingProduct.productId
+            ? { ...p, name, price: price, stock: stock, image: imagePreview || p.image }
             : p
         )
       );
@@ -234,26 +236,27 @@ export default function ProductManagerPage() {
         alert('Please upload an image for the new product.');
         return;
       }
-      const newId = Math.max(...sellerProducts.map(p => p.id), 0) + 1;
-      console.log('Adding new product:', { id: newId, name, description, price, stock, imageName: image.name });
-      setSellerProducts(prev => [
-        ...prev, 
-        { id: newId, name, price: parseFloat(price), stock: parseInt(stock), image: imagePreview || '' }
-      ]);
+      console.log('Adding new product:', { name, description, imagePreview, price, stock });
+
+      // backend product
+      let id = await getStoreId();
+      if (id != undefined && imagePreview !== null) {
+        backend.createProduct(auth.principal, id, name, description, imagePreview, price, stock)
+      }
     }
     handleShowListView();
   };
 
   const handleDelete = (product: Product) => {
-    console.log(`Deleting product with ID: ${product.id}`);
-    setSellerProducts(prev => prev.filter(p => p.id !== product.id));
+    console.log(`Deleting product with ID: ${product.productId}`);
+    setSellerProducts(prev => prev?.filter(p => p.productId !== product.productId));
     setDeletingProduct(null);
   };
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50 p-8">
       <div className="container mx-auto">
-        
+
         {view === 'list' && (
           <div>
             <div className="mb-8">
@@ -268,8 +271,8 @@ export default function ProductManagerPage() {
                   {/* Search Bar */}
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-600 h-4 w-4" />
-                    <Input 
-                      placeholder="Search by product name..." 
+                    <Input
+                      placeholder="Search by product name..."
                       className="pl-10"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -278,8 +281,8 @@ export default function ProductManagerPage() {
 
                   {/* Quick Sort */}
                   <div className="flex gap-2">
-                    <select 
-                      value={sortBy} 
+                    <select
+                      value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as SortOption)}
                       className="px-3 py-2 border border-amber-300 rounded-md bg-white text-amber-900 focus:ring-2 focus:ring-teal-500"
                     >
@@ -318,8 +321,8 @@ export default function ProductManagerPage() {
                       {/* Stock Filter */}
                       <div>
                         <label className="block text-sm font-medium text-amber-800 mb-2">Stock Status</label>
-                        <select 
-                          value={stockFilter} 
+                        <select
+                          value={stockFilter}
                           onChange={(e) => setStockFilter(e.target.value as StockFilter)}
                           className="w-full px-3 py-2 border border-amber-300 rounded-md bg-white text-amber-900 focus:ring-2 focus:ring-teal-500"
                         >
@@ -371,7 +374,7 @@ export default function ProductManagerPage() {
             {/* Results Summary */}
             <div className="mb-4 flex justify-between items-center">
               <p className="text-amber-700">
-                Showing {filteredProducts.length} of {sellerProducts.length} products
+                Showing {filteredProducts?.length} of {sellerProducts?.length} products
               </p>
               {getActiveFiltersCount() > 0 && (
                 <div className="flex gap-2 flex-wrap">
@@ -385,8 +388,8 @@ export default function ProductManagerPage() {
                   )}
                   {stockFilter !== 'all' && (
                     <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-                      {stockFilter === 'in-stock' ? 'In Stock' : 
-                       stockFilter === 'out-of-stock' ? 'Out of Stock' : 'Low Stock'}
+                      {stockFilter === 'in-stock' ? 'In Stock' :
+                        stockFilter === 'out-of-stock' ? 'Out of Stock' : 'Low Stock'}
                       <button onClick={() => setStockFilter('all')} className="ml-1 hover:text-amber-900">
                         <X className="h-3 w-3" />
                       </button>
@@ -413,9 +416,9 @@ export default function ProductManagerPage() {
                 <div className="text-right">ACTIONS</div>
               </div>
               <div className="divide-y divide-amber-100">
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((product) => (
-                    <div key={product.id} className="grid grid-cols-6 gap-4 items-center p-4">
+                {filteredProducts != undefined && filteredProducts.length > 0 ? (
+                  filteredProducts?.map((product) => (
+                    <div key={product.productId} className="grid grid-cols-6 gap-4 items-center p-4">
                       <div className="col-span-2 font-medium text-amber-950 flex items-center gap-3">
                         <span>{product.name}</span>
                       </div>
@@ -482,7 +485,7 @@ export default function ProductManagerPage() {
                     </label>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <label htmlFor="name" className="font-medium text-amber-800">Product Name</label>
                   <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -494,11 +497,11 @@ export default function ProductManagerPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label htmlFor="price" className="font-medium text-amber-800">Price ($)</label>
-                    <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+                    <Input id="price" type="number" value={price} onChange={(e) => setPrice(e.target.valueAsNumber)} />
                   </div>
                   <div className="space-y-2">
                     <label htmlFor="stock" className="font-medium text-amber-800">Stock</label>
-                    <Input id="stock" type="number" value={stock} onChange={(e) => setStock(e.target.value)} />
+                    <Input id="stock" type="number" value={stock} onChange={(e) => setStock(e.target.valueAsNumber)} />
                   </div>
                 </div>
                 <Button onClick={handleSubmit} className="w-full bg-teal-500 hover:bg-teal-600 text-white">

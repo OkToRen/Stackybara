@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authHooks } from '@ic-reactor/react/dist/helpers';
 import { useAuth } from '@ic-reactor/react';
 import { useAuthContext } from '@/lib/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { backend } from '@/declarations/backend';
 import { UserData } from '@/declarations/backend/backend.did';
 import { useLoading } from '@/hooks/UseLoading';
@@ -54,6 +54,10 @@ export default function ProfilePage() {
   //   console.log(response);
   //   console.log('registering user finished');
   // };
+
+  const goToSellerPage = async () => {
+    navigate('/seller/profile');
+  };
 
   const handleBecomeSeller = async () => {
     if (userInfo) {
@@ -166,7 +170,7 @@ export default function ProfilePage() {
   };
 
   if (loading.isLoading) {
-    return //<StackybaraLoadingPage />;
+    return <StackybaraLoadingPage />;
   }
 
   return (
@@ -604,12 +608,23 @@ export default function ProfilePage() {
                   <CardTitle className="text-amber-900">Change to Seller</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button
-                    className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
-                    onClick={handleBecomeSeller}
-                  >
-                    Become a Seller
-                  </Button>
+                  {userInfo?.isSeller ? (
+                    <Link to={'/seller/profile'}>
+                      <Button
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                      >
+                        Store Page
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+                      onClick={handleBecomeSeller}
+                    >
+                      Become a Seller
+                    </Button>
+                  )}
+
                 </CardContent>
               </Card>
 
