@@ -25,6 +25,7 @@ import ChatPage from './pages/ChatPage';
 import ScrollToTop from './hooks/UseScrollToTop';
 import ChatRoomPage from './pages/ChatRoomPage';
 import SellerProfilePage from './pages/SellerProfilePage';
+import WalletPage from './pages/WalletPage';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
 
               <Route element={<PrivateRoute />}>
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/wallet" element={<WalletPage />} />
                 <Route path="/my-orders" element={<MyOrdersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/cart" element={<CartPage />} />
