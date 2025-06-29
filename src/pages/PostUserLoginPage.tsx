@@ -3,6 +3,7 @@ import { backend } from '@/declarations/backend';
 import { useAuthContext } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
+import StackybaraLoadingPage from "./LoadingScreen";
 
 export default function PostUserLoginPage() {
   const { actor, isAuthenticated, principal } = useAuthContext();
@@ -42,6 +43,11 @@ export default function PostUserLoginPage() {
 
     fetchUser();
   }, [isAuthenticated, principal, actor]);
+
+  // Add a loading state for authentication
+  if (!isAuthenticated || !principal) {
+    return <StackybaraLoadingPage />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

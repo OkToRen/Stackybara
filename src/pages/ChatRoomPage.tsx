@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Store, Send, Check } from 'lucide-react';
+import StackybaraLoadingPage from "./LoadingScreen";
 
 export default function ChatRoomPage() {
     const auth = useAuthContext();
@@ -152,7 +153,7 @@ export default function ChatRoomPage() {
                 />
                 <div className="flex-1 overflow-y-auto pr-2">
                     {loadingSidebar ? (
-                        <div className="text-gray-400">Loading chats...</div>
+                        <StackybaraLoadingPage />
                     ) : filteredChats.length === 0 ? (
                         <div className="text-gray-400">No chats found.</div>
                     ) : filteredChats.map(chat => (

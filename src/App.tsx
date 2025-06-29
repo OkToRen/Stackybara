@@ -28,6 +28,7 @@ import SellerProfilePage from './pages/SellerProfilePage';
 import SupportPage from './pages/SupportPage';
 import { TicketProvider } from './lib/TicketContext';
 import WalletPage from './pages/WalletPage';
+import FeatureListPage from './pages/FeatureListPage';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
                     element={<ProductDetailsPage />}
                   />
                   <Route path="about" element={<AboutPage />} />
+                  <Route path="features" element={<FeatureListPage />} />
                   <Route path="postlogin" element={<PostUserLoginPage />} />
                   <Route path="postseller" element={<PostUserToSellerPage />} />
                 </Route>
