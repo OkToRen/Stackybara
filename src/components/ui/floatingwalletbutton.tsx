@@ -35,13 +35,6 @@ export default function FloatingWalletButton() {
   return (
     <div className="fixed bottom-6 left-6 z-40">
       <div className="relative">
-        {/* Notification Badge */}
-        {hasNotification && (
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-amber-500 text-white text-xs rounded-full flex items-center justify-center animate-bounce z-10">
-            <Plus className="h-3 w-3" />
-          </div>
-        )}
-
         {/* Pulsing Ring */}
         {hasNotification && (
           <div className="absolute inset-0 w-14 h-14 bg-amber-500 rounded-full animate-ping opacity-20"></div>
