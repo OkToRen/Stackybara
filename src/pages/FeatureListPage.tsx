@@ -39,6 +39,18 @@ import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/c
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import aboutus from "@/assets/aboutus.jpg"
+import livechat from "@/assets/livechat.jpg"
+import orderprocessing from "@/assets/orderprocessing.png"
+import productmanager from "@/assets/productmanager.png"
+import productscatalog from "@/assets/productscatalog.jpg"
+import sellerdashboard from "@/assets/sellerdashboard.png"
+import sellertransformation from "@/assets/sellertransformation.jpg"
+import shoppingcart from "@/assets/shoppingcart.jpg"
+import smartonboarding from "@/assets/smartonboarding.png"
+import storecustom from "@/assets/storecustom.png"
+import supportcenter from "@/assets/supportcenter.jpg"
+import userprofile from "@/assets/userprofile.png"
 
 const FeaturesPage = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -61,7 +73,7 @@ const FeaturesPage = () => {
       route: "/products",
       icon: ShoppingBag,
       color: "from-emerald-500 to-teal-600",
-      image: "https://placehold.co/400x250?text=Products+Catalog",
+      image: productscatalog,
       category: "Shopping",
       features: ["Advanced Search", "Smart Filters", "Product Reviews", "Wishlist Integration"],
       stats: { items: "10K+", categories: "50+" },
@@ -76,7 +88,7 @@ const FeaturesPage = () => {
       description: "Intelligent cart management with saved items and quick checkout",
       route: "/cart",
       icon: ShoppingCart,
-      image: "https://placehold.co/400x250?text=Shopping+Cart",
+      image: shoppingcart,
       category: "Shopping",
       protected: true,
       features: ["Auto-Save", "Price Tracking", "Bulk Actions", "Quick Checkout"],
@@ -92,7 +104,7 @@ const FeaturesPage = () => {
       description: "Comprehensive account management with personalized dashboard",
       route: "/profile",
       icon: User,
-      image: "https://placehold.co/400x250?text=User+Profile",
+      image: userprofile,
       category: "Account",
       protected: true,
       features: ["Order History", "Preferences", "Security Settings", "Achievements"],
@@ -108,7 +120,7 @@ const FeaturesPage = () => {
       description: "24/7 real-time messaging with AI-powered assistance",
       route: "/chat",
       icon: MessageCircle,
-      image: "https://placehold.co/400x250?text=Live+Chat",
+      image: livechat,
       category: "Communication",
       features: ["24/7 AI Support", "Human Agents", "Multi-language", "File Sharing"],
       stats: { response: "<30s", satisfaction: "98%" },
@@ -123,7 +135,7 @@ const FeaturesPage = () => {
       description: "Comprehensive help center with ticket system and knowledge base",
       route: "/support",
       icon: HeadphonesIcon,
-      image: "https://placehold.co/400x250?text=Support+Center",
+      image: supportcenter,
       category: "Support",
       protected: true,
       features: ["Ticket System", "Knowledge Base", "Video Tutorials", "Community Forum"],
@@ -139,7 +151,7 @@ const FeaturesPage = () => {
       description: "Learn about our blockchain-powered e-commerce revolution",
       route: "/about",
       icon: Info,
-      image: "https://placehold.co/400x250?text=About+Us",
+      image: aboutus,
       category: "Information",
       features: ["Company Story", "Team Profiles", "Mission & Vision", "Blockchain Tech"],
       stats: { founded: "2024", team: "50+ Members" },
@@ -157,7 +169,7 @@ const FeaturesPage = () => {
       description: "Advanced analytics and performance insights for your store",
       route: "/seller",
       icon: BarChart3,
-      image: "https://placehold.co/400x250?text=Seller+Dashboard",
+      image: sellerdashboard,
       category: "Seller Tools",
       features: ["Real-time Analytics", "Sales Reports", "Customer Insights", "Revenue Tracking"],
       stats: { metrics: "20+", updates: "Real-time" },
@@ -172,7 +184,7 @@ const FeaturesPage = () => {
       description: "Intuitive product management with bulk operations and AI assistance",
       route: "/seller/productmanager",
       icon: Grid3X3,
-      image: "https://placehold.co/400x250?text=Product+Manager",
+      image: productmanager,
       category: "Seller Tools",
       features: ["Bulk Upload", "AI Descriptions", "Image Optimization", "Inventory Sync"],
       stats: { upload: "1000+ items", time: "90% Faster" },
@@ -187,7 +199,7 @@ const FeaturesPage = () => {
       description: "Streamlined order processing with automated workflows",
       route: "/seller/orders",
       icon: Truck,
-      image: "https://placehold.co/400x250?text=Order+Processing",
+      image: orderprocessing,
       category: "Seller Tools",
       features: ["Auto-Processing", "Shipping Labels", "Tracking Updates", "Return Management"],
       stats: { processing: "Automated", tracking: "Real-time" },
@@ -202,7 +214,7 @@ const FeaturesPage = () => {
       description: "Build your brand with customizable store themes and layouts",
       route: "/seller/profile",
       icon: Store,
-      image: "https://placehold.co/400x250?text=Store+Customization",
+      image: storecustom,
       category: "Seller Tools",
       features: ["Custom Themes", "Brand Assets", "Store Analytics", "SEO Optimization"],
       stats: { themes: "50+", customization: "Unlimited" },
@@ -220,7 +232,7 @@ const FeaturesPage = () => {
       description: "Guided setup process to personalize your Shoppybara experience",
       route: "/postlogin",
       icon: UserPlus,
-      image: "https://placehold.co/400x250?text=Onboarding",
+      image: smartonboarding,
       category: "Authentication",
       features: ["Profile Setup", "Preferences", "Tutorial", "Welcome Bonus"],
       stats: { completion: "5 min", bonus: "$10 Credit" },
@@ -235,7 +247,7 @@ const FeaturesPage = () => {
       description: "Transform your account into a powerful selling platform",
       route: "/postseller",
       icon: Store,
-      image: "https://placehold.co/400x250?text=Become+Seller",
+      image: sellertransformation,
       category: "Authentication",
       features: ["Verification Process", "Store Setup", "Payment Config", "First Product"],
       stats: { approval: "24h", commission: "Low Fees" },

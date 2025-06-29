@@ -76,7 +76,7 @@ export default function AboutPage() {
           users: Math.floor(targets.users * easeOut),
           transactions: Math.floor(targets.transactions * easeOut),
           countries: Math.floor(targets.countries * easeOut),
-          uptime: Math.min(targets.uptime, (targets.uptime * easeOut).toFixed(1)),
+          uptime: Math.min(targets.uptime, parseFloat((targets.uptime * easeOut).toFixed(1))),
         })
 
         if (step >= steps) {
