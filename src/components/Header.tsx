@@ -82,13 +82,11 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${
-          scrolled
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${isVisible ? "translate-y-0" : "-translate-y-full"
+          } ${scrolled
             ? "bg-white/95 backdrop-blur-xl shadow-lg border-b border-amber-200/50"
             : "bg-white/80 backdrop-blur-sm border-b border-amber-200/30"
-        }`}
+          }`}
       >
         {/* Top Banner */}
         <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white py-2 px-4 text-center text-sm font-medium">
@@ -125,9 +123,8 @@ export default function Header() {
             <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
               <div className="relative w-full group">
                 <div
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-teal-500/20 to-emerald-500/20 transition-opacity duration-300 ${
-                    searchFocused ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-teal-500/20 to-emerald-500/20 transition-opacity duration-300 ${searchFocused ? "opacity-100" : "opacity-0"
+                    }`}
                 />
                 <div className="relative flex items-center">
                   <div className="absolute left-4 z-10">
@@ -181,9 +178,8 @@ export default function Header() {
                     <Link
                       key={index}
                       to={item.path}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 group ${
-                        isActive ? "bg-teal-100 text-teal-700" : "text-amber-800 hover:text-teal-600 hover:bg-teal-50"
-                      }`}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 group ${isActive ? "bg-teal-100 text-teal-700" : "text-amber-800 hover:text-teal-600 hover:bg-teal-50"
+                        }`}
                     >
                       <item.icon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                       <span>{item.name}</span>
@@ -199,6 +195,7 @@ export default function Header() {
                   variant="ghost"
                   size="sm"
                   className="relative text-amber-800 hover:text-teal-600 hover:bg-teal-50 rounded-xl p-3 group"
+                  onClick={() => { navigate('/profile') }}
                 >
                   <Heart className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
                   <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
@@ -314,9 +311,8 @@ export default function Header() {
                     <Link
                       key={index}
                       to={item.path}
-                      className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
-                        isActive ? "bg-teal-100 text-teal-700" : "text-amber-800 hover:text-teal-600 hover:bg-teal-50"
-                      }`}
+                      className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 ${isActive ? "bg-teal-100 text-teal-700" : "text-amber-800 hover:text-teal-600 hover:bg-teal-50"
+                        }`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <item.icon className="h-5 w-5" />

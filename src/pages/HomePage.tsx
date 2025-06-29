@@ -29,6 +29,7 @@ import Logo from "../assets/Logo.png"
 import { useProduct } from "@/lib/ProductContext"
 import { useCart } from "@/lib/CartContext"
 import { useAuthContext } from "@/lib/AuthContext"
+import { Product } from "@/declarations/backend/backend.did"
 
 export default function HomePage() {
   const { product, setProduct } = useProduct()
@@ -126,7 +127,7 @@ export default function HomePage() {
   const handleAddToCart = (product: (typeof featuredProducts)[0]) => {
     if (auth.isAuthenticated) {
       addToCart({
-        id: product.id,
+        id: product.productId,
         name: product.name,
         price: product.price,
         image: product.image,
@@ -138,58 +139,59 @@ export default function HomePage() {
     }
   }
 
-  const featuredProducts = [
+  const featuredProducts: Product[] = [
     {
-      id: 1,
-      name: "Wireless Bluetooth Headphones",
-      price: 89.99,
-      originalPrice: 129.99,
+      productId: 10,
+      storeId: 11,
+      name: 'Wireless Bluetooth Headphones',
+      price: 129.99,
+      stock: 5,
       rating: 4.8,
-      reviews: 324,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
-      category: "Electronics",
-      badge: "Best Seller",
-      description: "Premium quality wireless headphones with noise cancellation",
-      sellerPrincipal: "oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae",
+      review: 324,
+      image:
+        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description:
+        'Premium quality wireless headphones with noise cancellation',
     },
     {
-      id: 2,
-      name: "Smart Fitness Watch",
+      productId: 11,
+      storeId: 12,
+      name: 'Smart Fitness Watch',
       price: 199.99,
-      originalPrice: 249.99,
+      stock: 10,
       rating: 4.6,
-      reviews: 156,
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
-      category: "Electronics",
-      badge: "New",
-      description: "Track your fitness goals with this advanced smartwatch",
-      sellerPrincipal: "oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae",
+      review: 156,
+      image:
+        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description: 'Track your fitness goals with this advanced smartwatch'
     },
     {
-      id: 3,
-      name: "Ergonomic Laptop Stand",
+      productId: 12,
+      storeId: 13,
+      name: 'Ergonomic Laptop Stand',
       price: 45.99,
-      originalPrice: 59.99,
+      stock: 7,
       rating: 4.9,
-      reviews: 89,
-      image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop",
-      category: "Office",
-      badge: "Sale",
-      description: "Adjustable aluminum laptop stand for better posture",
-      sellerPrincipal: "oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae",
+      review: 89,
+      image:
+        'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop',
+      category: 'Office',
+      description: 'Adjustable aluminum laptop stand for better posture',
     },
     {
-      id: 4,
-      name: "Portable Bluetooth Speaker",
+      productId: 13,
+      storeId: 14,
+      name: 'Portable Bluetooth Speaker',
       price: 79.99,
-      originalPrice: 99.99,
+      stock: 9,
       rating: 4.7,
-      reviews: 203,
-      image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop",
-      category: "Electronics",
-      badge: "Popular",
-      description: "Waterproof speaker with 12-hour battery life",
-      sellerPrincipal: "oova3-jr6xc-2mphk-d3oee-x2h4f-kf234-bzgr7-7yabp-kapqz-o3fqb-hae",
+      review: 203,
+      image:
+        'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=200&h=200&fit=crop',
+      category: 'Electronics',
+      description: 'Waterproof speaker with 12-hour battery life'
     },
   ]
 
@@ -270,9 +272,8 @@ export default function HomePage() {
         <div className="relative container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div
-              className={`space-y-8 transition-all duration-1000 ease-out ${
-                heroInView ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
-              }`}
+              className={`space-y-8 transition-all duration-1000 ease-out ${heroInView ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+                }`}
             >
               <div className="space-y-6">
                 <Badge className="bg-teal-100 text-teal-800 px-6 py-2 text-sm font-medium animate-bounce-in hover:scale-105 transition-transform duration-300">
@@ -332,9 +333,8 @@ export default function HomePage() {
             </div>
 
             <div
-              className={`relative transition-all duration-1000 ease-out delay-300 ${
-                heroInView ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
-              }`}
+              className={`relative transition-all duration-1000 ease-out delay-300 ${heroInView ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+                }`}
             >
               <div className="relative">
                 {/* Main Hero Image */}
@@ -374,9 +374,8 @@ export default function HomePage() {
       <section id="features-section" className="py-20">
         <div className="container mx-auto px-4">
           <div
-            className={`text-center mb-16 transition-all duration-800 ease-out ${
-              featuresInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
+            className={`text-center mb-16 transition-all duration-800 ease-out ${featuresInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
           >
             <h2 className="text-3xl lg:text-4xl font-bold text-amber-900 mb-6">Why Choose Shoppybara?</h2>
             <p className="text-xl text-amber-700 max-w-3xl mx-auto">
@@ -414,9 +413,8 @@ export default function HomePage() {
             ].map((feature, index) => (
               <Card
                 key={index}
-                className={`group cursor-pointer border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-2xl ${
-                  featuresInView ? `opacity-100 translate-y-0 ${feature.delay}` : "opacity-0 translate-y-10"
-                }`}
+                className={`group cursor-pointer border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-2xl ${featuresInView ? `opacity-100 translate-y-0 ${feature.delay}` : "opacity-0 translate-y-10"
+                  }`}
               >
                 <CardHeader className="text-center pb-4">
                   <div
@@ -441,9 +439,8 @@ export default function HomePage() {
       <section id="products-section" className="py-20">
         <div className="container mx-auto px-4">
           <div
-            className={`flex flex-col lg:flex-row justify-between items-start lg:items-center mb-16 transition-all duration-800 ease-out ${
-              productsInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
+            className={`flex flex-col lg:flex-row justify-between items-start lg:items-center mb-16 transition-all duration-800 ease-out ${productsInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
           >
             <div className="mb-6 lg:mb-0">
               <h2 className="text-3xl lg:text-4xl font-bold text-amber-900 mb-4">Featured Products</h2>
@@ -474,15 +471,14 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {featuredProducts.map((product, index) => {
-              const cartItem = cart.find((item) => item.id === product.id)
-              const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+              const cartItem = cart.find((item) => item.id === product.productId)
+              const discount = Math.round((product.price * 90) / 100)
 
               return (
-                <Link key={product.id} to="/productdetails" onClick={() => setProduct(product)}>
+                <Link key={product.productId} to="/productdetails" onClick={() => setProduct(product)}>
                   <Card
-                    className={`group cursor-pointer border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-2xl overflow-hidden ${
-                      productsInView ? `opacity-100 translate-y-0` : "opacity-0 translate-y-10"
-                    }`}
+                    className={`group cursor-pointer border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-2xl overflow-hidden ${productsInView ? `opacity-100 translate-y-0` : "opacity-0 translate-y-10"
+                      }`}
                     style={{
                       transitionDelay: productsInView ? `${index * 150}ms` : "0ms",
                     }}
@@ -496,13 +492,6 @@ export default function HomePage() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                        {/* Badges */}
-                        <Badge className="absolute top-3 left-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white border-0 text-xs font-medium">
-                          {product.badge}
-                        </Badge>
-                        <Badge className="absolute top-3 right-3 bg-red-500 text-white border-0 text-xs font-medium">
-                          -{discount}%
-                        </Badge>
 
                         {/* Wishlist Button */}
                         <Button
@@ -530,14 +519,14 @@ export default function HomePage() {
                             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm font-medium text-amber-700 ml-1">{product.rating}</span>
                           </div>
-                          <span className="text-sm text-amber-600">({product.reviews} reviews)</span>
+                          <span className="text-sm text-amber-600">({product.review} reviews)</span>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2">
                               <span className="text-xl font-bold text-amber-900">${product.price}</span>
-                              <span className="text-sm text-amber-600 line-through">${product.originalPrice}</span>
+                              <span className="text-sm text-amber-600 line-through">${product.price}</span>
                             </div>
                           </div>
                         </div>
@@ -566,7 +555,7 @@ export default function HomePage() {
                               className="h-8 w-8 p-0 hover:bg-amber-200 rounded-l-lg"
                               onClick={(e) => {
                                 e.preventDefault()
-                                decreaseFromCart(product.id)
+                                decreaseFromCart(product.productId)
                               }}
                             >
                               -
@@ -581,7 +570,7 @@ export default function HomePage() {
                               onClick={(e) => {
                                 e.preventDefault()
                                 addToCart({
-                                  id: product.id,
+                                  id: product.productId,
                                   name: product.name,
                                   price: product.price,
                                   image: product.image,
@@ -627,9 +616,8 @@ export default function HomePage() {
       <section id="testimonials-section" className="py-20 bg-white/50 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <div
-            className={`text-center mb-16 transition-all duration-800 ease-out ${
-              testimonialsInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-            }`}
+            className={`text-center mb-16 transition-all duration-800 ease-out ${testimonialsInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              }`}
           >
             <h2 className="text-3xl lg:text-4xl font-bold text-amber-900 mb-6">What Our Customers Say</h2>
             <p className="text-xl text-amber-700 max-w-3xl mx-auto">
@@ -641,9 +629,8 @@ export default function HomePage() {
             {testimonials.map((testimonial, index) => (
               <Card
                 key={testimonial.id}
-                className={`border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-xl group ${
-                  testimonialsInView ? `opacity-100 translate-y-0` : "opacity-0 translate-y-10"
-                }`}
+                className={`border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-xl group ${testimonialsInView ? `opacity-100 translate-y-0` : "opacity-0 translate-y-10"
+                  }`}
                 style={{ transitionDelay: `${index * 200}ms` }}
               >
                 <CardContent className="p-8">
