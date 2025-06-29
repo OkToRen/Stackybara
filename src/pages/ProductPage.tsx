@@ -149,7 +149,7 @@ export default function ProductsPage() {
         const products = Array.isArray(response) ? response : undefined;
         console.log(products);
         if (products != undefined && Array.isArray(products)) {
-          setProducts(products as Product[]);
+          setProducts(prev => [...(prev ?? []), ...products]);
         }
       } catch (err) {
         console.error("Error fetching store:", err);
@@ -157,9 +157,8 @@ export default function ProductsPage() {
     })
   }, [loading]);
 
-  useEffect(() => {
-    
-  setProducts(prev => [...(prev ?? []), ...initialProducts]);
+  useEffect(() => {    
+    setProducts(initialProducts);
     fetchProducts();
     const params = new URLSearchParams(location.search);
     const query = params.get('query') || '';
