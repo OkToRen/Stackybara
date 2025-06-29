@@ -1,4 +1,3 @@
-import { useQueryCall, useUpdateCall } from '@ic-reactor/react';
 import './App.css';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
@@ -49,7 +48,10 @@ function App() {
                 <Route path="/my-orders" element={<MyOrdersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/cart" element={<CartPage />} />
-                <Route path="/chat/:sellerPrincipal" element={<ChatRoomPage />} />
+                <Route
+                  path="/chat/:sellerPrincipal"
+                  element={<ChatRoomPage />}
+                />
               </Route>
 
               <Route path="/order/:orderId" element={<OrderDetailPage />} />
