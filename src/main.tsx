@@ -5,12 +5,14 @@ import App from './App';
 import { canisterId, idlFactory } from './declarations/backend';
 import { AuthProvider } from './lib/AuthContext';
 import './index.css';
+import AnimatedCursor from 'react-animated-cursor';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <AgentProvider withProcessEnv>
       <ActorProvider idlFactory={idlFactory} canisterId={canisterId}>
         <AuthProvider>
+          <AnimatedCursor />
           <App />
         </AuthProvider>
       </ActorProvider>

@@ -1,4 +1,3 @@
-import { useQueryCall, useUpdateCall } from '@ic-reactor/react';
 import './App.css';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
@@ -20,8 +19,6 @@ import CheckoutPage from './pages/CheckOutPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import PostUserLoginPage from './pages/PostUserLoginPage';
-import LoadingScreen from './pages/LoadingScreen';
-import ChatPage from './pages/ChatPage';
 import ScrollToTop from './hooks/UseScrollToTop';
 import ChatRoomPage from './pages/ChatRoomPage';
 
@@ -47,7 +44,10 @@ function App() {
                 <Route path="/my-orders" element={<MyOrdersPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/cart" element={<CartPage />} />
-                <Route path="/chat/:sellerPrincipal" element={<ChatRoomPage />} />
+                <Route
+                  path="/chat/:sellerPrincipal"
+                  element={<ChatRoomPage />}
+                />
               </Route>
 
               <Route path="/order/:orderId" element={<OrderDetailPage />} />
