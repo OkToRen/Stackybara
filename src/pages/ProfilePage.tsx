@@ -1,8 +1,8 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from 'react';
 import {
   User,
   Settings,
@@ -27,221 +27,269 @@ import {
   Crown,
   Sparkles,
   Gift,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
-import { Progress } from "@/components/ui/progress"
-import { useAuthContext } from "@/lib/AuthContext"
-import { Link, useNavigate } from "react-router-dom"
-import { backend } from "@/declarations/backend"
-import type { UserData } from "@/declarations/backend/backend.did"
-import { useLoading } from "@/hooks/UseLoading"
-import StackybaraLoadingPage from "@/pages/LoadingScreen"
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Progress } from '@/components/ui/progress';
+import { useAuthContext } from '@/lib/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
+import { backend } from '@/declarations/backend';
+import type { UserData } from '@/declarations/backend/backend.did';
+import { useLoading } from '@/hooks/UseLoading';
+import StackybaraLoadingPage from '@/pages/LoadingScreen';
 
 export default function ProfilePage() {
-  const auth = useAuthContext()
-  const navigate = useNavigate()
-  const loading = useLoading()
-  const [isEditing, setIsEditing] = useState(false)
-  const [userInfo, setUserInfo] = useState<UserData>()
-  const [totalOrders, setTotalOrders] = useState(0)
-  const [totalSpent, setTotalSpent] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
-  const [activeTab, setActiveTab] = useState("profile")
-  const [profileImage, setProfileImage] = useState<string | null>(null)
-  const [achievements, setAchievements] = useState([
-    { id: 1, title: "First Purchase", description: "Made your first order", earned: true, icon: ShoppingBag },
-    { id: 2, title: "Loyal Customer", description: "10+ orders completed", earned: true, icon: Heart },
-    { id: 3, title: "Big Spender", description: "Spent over $1000", earned: false, icon: Crown },
-    { id: 4, title: "Review Master", description: "Left 25+ reviews", earned: false, icon: Star },
-  ])
+  const auth = useAuthContext();
+  const navigate = useNavigate();
+  const loading = useLoading();
+  const [isEditing, setIsEditing] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserData>({
+    principal: auth.principal,
+    name: '',
+    createdAt: BigInt(0),
+    membershipLevel: '',
+    email: '',
+    address: '',
+    phone: '',
+    isSeller: false,
+  });
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(true); // Add this line
+  const [activeTab, setActiveTab] = useState('profile'); // Add this line
 
-  // Animation trigger
-  useEffect(() => {
-    setIsVisible(true)
-  }, [])
+  // Define achievements array
+  const achievements = [
+    {
+      id: 1,
+      title: 'First Purchase',
+      description: 'Completed your first order',
+      icon: Award,
+      earned: true,
+    },
+    {
+      id: 2,
+      title: 'Wishlist Pro',
+      description: 'Added 10 items to your wishlist',
+      icon: Heart,
+      earned: false,
+    },
+    {
+      id: 3,
+      title: 'Top Reviewer',
+      description: 'Left 5 product reviews',
+      icon: Star,
+      earned: false,
+    },
+    {
+      id: 4,
+      title: 'Loyal Member',
+      description: 'Been a member for 1 year',
+      icon: Crown,
+      earned: true,
+    },
+  ];
 
   const getUser = useCallback(() => {
     return loading.withLoading(async () => {
-      console.log(auth.principal)
-      const response = await backend.getUser(auth.principal)
-      console.log(Array.isArray(response))
-      setUserInfo(Array.isArray(response) ? response[0] : undefined)
-    })
-  }, [loading])
+      const response = await backend.getUser(auth.principal);
+      console.log(response);
+      console.log(Array.isArray(response));
+      setUserInfo(
+        Array.isArray(response) && response[0] !== undefined
+          ? response[0]
+          : userInfo,
+      );
+    });
+  }, [loading]);
+
+  // const registerUser = async () => {
+  //   console.log('registering user');
+  //   const response = await backend.registerUser(
+  //     'darren',
+  //     'darrenharyanto@gmail.com',
+  //     'Jakarta',
+  //     '08111777566',
+  //     false,
+  //   );
+  //   console.log(response);
+  //   console.log('registering user finished');
+  // };
 
   const goToSellerPage = async () => {
-    navigate("/seller/profile")
-  }
+    navigate('/seller/profile');
+  };
 
   const handleBecomeSeller = async () => {
-    if (userInfo) {
-      const updatedUserData = { ...userInfo, isSeller: true }
-      await loading.withLoading(async () => {
-        await backend.updateUser(auth.principal, updatedUserData)
-        setUserInfo(updatedUserData)
-        console.log("User updated to seller:", updatedUserData)
-        navigate("/postseller")
-      })
-    } else {
-      console.warn("No user info available to update.")
-    }
-  }
+    const updatedUserData = { ...userInfo, isSeller: true };
+    await loading.withLoading(async () => {
+      await backend.updateUser(auth.principal, updatedUserData);
+      setUserInfo(updatedUserData);
+      console.log('User updated to seller:', updatedUserData);
+      navigate('/seller/postseller');
+    });
+  };
 
   useEffect(() => {
-    getUser()
-  }, [])
+    getUser();
+  }, []);
 
   const recentOrders = [
     {
-      id: "ORD-2024-001",
-      date: "2024-01-15",
-      status: "Delivered",
+      id: 'ORD-2024-001',
+      date: '2024-01-15',
+      status: 'Delivered',
       total: 89.99,
       items: 2,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop",
-      products: ["Wireless Headphones", "Phone Case"],
+      image:
+        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop',
+      products: ['Wireless Headphones', 'Phone Case'],
     },
     {
-      id: "ORD-2024-002",
-      date: "2024-01-10",
-      status: "In Transit",
+      id: 'ORD-2024-002',
+      date: '2024-01-10',
+      status: 'In Transit',
       total: 199.99,
       items: 1,
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&h=100&fit=crop",
-      products: ["Smart Watch"],
+      image:
+        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&h=100&fit=crop',
+      products: ['Smart Watch'],
     },
     {
-      id: "ORD-2024-003",
-      date: "2024-01-05",
-      status: "Delivered",
+      id: 'ORD-2024-003',
+      date: '2024-01-05',
+      status: 'Delivered',
       total: 45.99,
       items: 1,
-      image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=100&h=100&fit=crop",
-      products: ["Laptop Stand"],
+      image:
+        'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=100&h=100&fit=crop',
+      products: ['Laptop Stand'],
     },
-  ]
+  ];
 
   const wishlistItems = [
     {
       id: 1,
-      name: "Premium Wireless Earbuds",
+      name: 'Premium Wireless Earbuds',
       price: 149.99,
       originalPrice: 199.99,
-      image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=200&h=200&fit=crop",
+      image:
+        'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=200&h=200&fit=crop',
       inStock: true,
       rating: 4.8,
     },
     {
       id: 2,
-      name: "Smart Home Hub",
+      name: 'Smart Home Hub',
       price: 99.99,
       originalPrice: 129.99,
-      image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop",
+      image:
+        'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=200&fit=crop',
       inStock: true,
       rating: 4.6,
     },
     {
       id: 3,
-      name: "Fitness Tracker Pro",
+      name: 'Fitness Tracker Pro',
       price: 249.99,
       originalPrice: 299.99,
-      image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=200&h=200&fit=crop",
+      image:
+        'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=200&h=200&fit=crop',
       inStock: false,
       rating: 4.9,
     },
-  ]
+  ];
 
   const addresses = [
     {
       id: 1,
-      type: "Home",
-      name: "John Doe",
-      address: "123 Main St, San Francisco, CA 94102",
-      phone: "+1 (555) 123-4567",
+      type: 'Home',
+      name: 'John Doe',
+      address: '123 Main St, San Francisco, CA 94102',
+      phone: '+1 (555) 123-4567',
       isDefault: true,
     },
     {
       id: 2,
-      type: "Work",
-      name: "John Doe",
-      address: "456 Business Ave, San Francisco, CA 94105",
-      phone: "+1 (555) 987-6543",
+      type: 'Work',
+      name: 'John Doe',
+      address: '456 Business Ave, San Francisco, CA 94105',
+      phone: '+1 (555) 987-6543',
       isDefault: false,
     },
-  ]
+  ];
 
   const handleSave = async () => {
-    setIsEditing(false)
-    if (userInfo) {
-      await backend.updateUser(auth.principal, userInfo)
-    }
-  }
+    setIsEditing(false);
+    console.log(userInfo);
+    await backend.updateUser(auth.principal, userInfo);
+  };
 
   const handleLogoutClick = () => {
-    auth.logout()
-  }
+    auth.logout();
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (e) => {
-        setProfileImage(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+        setProfileImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Delivered":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "In Transit":
-        return "bg-blue-100 text-blue-800 border-blue-200"
-      case "Processing":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "Cancelled":
-        return "bg-red-100 text-red-800 border-red-200"
+      case 'Delivered':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'In Transit':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Processing':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200"
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
-  }
+  };
 
   const getMembershipColor = (level: string) => {
     switch (level) {
-      case "Gold":
-        return "from-yellow-400 to-yellow-600"
-      case "Silver":
-        return "from-gray-400 to-gray-600"
-      case "Platinum":
-        return "from-purple-400 to-purple-600"
+      case 'Gold':
+        return 'from-yellow-400 to-yellow-600';
+      case 'Silver':
+        return 'from-gray-400 to-gray-600';
+      case 'Platinum':
+        return 'from-purple-400 to-purple-600';
       default:
-        return "from-amber-400 to-amber-600"
+        return 'from-amber-400 to-amber-600';
     }
-  }
+  };
 
   const getMembershipProgress = (level: string) => {
     switch (level) {
-      case "Bronze":
-        return 25
-      case "Silver":
-        return 50
-      case "Gold":
-        return 75
-      case "Platinum":
-        return 100
+      case 'Bronze':
+        return 25;
+      case 'Silver':
+        return 50;
+      case 'Gold':
+        return 75;
+      case 'Platinum':
+        return 100;
       default:
-        return 25
+        return 25;
     }
-  }
+  };
 
   if (loading.isLoading) {
-    return <StackybaraLoadingPage />
+    return <StackybaraLoadingPage />;
   }
 
   return (
@@ -255,7 +303,7 @@ export default function ProfilePage() {
         {/* Enhanced Profile Header */}
         <div
           className={`mb-8 transition-all duration-1000 ease-out ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
           <Card className="border-amber-200/50 bg-white/80 backdrop-blur-sm shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500">
@@ -284,7 +332,7 @@ export default function ProfilePage() {
                   <div className="w-40 h-40 bg-white rounded-3xl border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden group-hover:scale-105 transition-all duration-300">
                     {profileImage ? (
                       <img
-                        src={profileImage || "/placeholder.svg"}
+                        src={profileImage || '/placeholder.svg'}
                         alt="Profile"
                         className="w-full h-full object-cover"
                       />
@@ -310,62 +358,32 @@ export default function ProfilePage() {
                   <div className="absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white animate-pulse" />
                 </div>
 
-                {/* Enhanced User Info */}
-                <div className="flex-1 space-y-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-3">
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-900 to-teal-800 bg-clip-text text-transparent">
-                          {userInfo?.name ?? "Welcome User"}
-                        </h1>
-                        <div className="flex items-center space-x-2">
-                          <Crown className="h-6 w-6 text-yellow-500 animate-pulse" />
-                          <Badge
-                            className={`bg-gradient-to-r ${getMembershipColor(
-                              userInfo?.membershipLevel ?? "Bronze",
-                            )} text-white px-4 py-1 text-sm font-semibold shadow-lg`}
-                          >
-                            {(userInfo?.membershipLevel ?? "Bronze") + " Member"}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <p className="text-lg text-amber-700 flex items-center space-x-2">
-                        <span>{userInfo?.email ?? "user@example.com"}</span>
-                        <Badge className="bg-green-100 text-green-800 text-xs">Verified</Badge>
+                <div className="flex-1">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold text-amber-900 mb-2">
+                        {userInfo?.name ?? ''}
+                      </h1>
+                      <p className="text-amber-700 mb-2">
+                        {userInfo?.email ?? ''}
                       </p>
-
-                      <div className="flex items-center space-x-6 text-sm text-amber-600">
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            Member since{" "}
-                            {userInfo?.createdAt
-                              ? new Date(Number(userInfo.createdAt) / 1_000_000).toLocaleString("default", {
-                                  month: "long",
-                                  year: "numeric",
-                                })
-                              : "January 2024"}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4" />
-                          <span>{userInfo?.address ?? "Location not set"}</span>
-                        </div>
-                      </div>
-
-                      {/* Membership Progress */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-amber-700 font-medium">Membership Progress</span>
-                          <span className="text-amber-600">
-                            {getMembershipProgress(userInfo?.membershipLevel ?? "Bronze")}% to next level
-                          </span>
-                        </div>
-                        <Progress
-                          value={getMembershipProgress(userInfo?.membershipLevel ?? "Bronze")}
-                          className="h-2 bg-amber-100"
-                        />
+                      <div className="flex items-center gap-4">
+                        <Badge
+                          className={`bg-gradient-to-r ${getMembershipColor(userInfo?.membershipLevel ?? '')} text-white`}
+                        >
+                          {(userInfo?.membershipLevel ?? '') + ' Member'}
+                        </Badge>
+                        <span className="text-sm text-amber-600">
+                          Member since{' '}
+                          {userInfo?.createdAt
+                            ? new Date(
+                                Number(userInfo.createdAt) / 1_000_000,
+                              ).toLocaleString('default', {
+                                month: 'long',
+                                year: 'numeric',
+                              })
+                            : ''}
+                        </span>
                       </div>
                     </div>
 
@@ -377,7 +395,7 @@ export default function ProfilePage() {
                         className="border-2 border-amber-300 text-amber-800 hover:bg-amber-50 px-6 py-3 rounded-xl transform hover:scale-105 transition-all duration-300 group bg-transparent"
                       >
                         <Edit3 className="h-4 w-4 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-                        {isEditing ? "Cancel" : "Edit Profile"}
+                        {isEditing ? 'Cancel' : 'Edit Profile'}
                       </Button>
 
                       {isEditing && (
@@ -399,35 +417,37 @@ export default function ProfilePage() {
                 {[
                   {
                     icon: ShoppingBag,
-                    label: "Total Orders",
+                    label: 'Total Orders',
                     value: totalOrders.toString(),
-                    color: "from-blue-500 to-blue-600",
-                    bgColor: "bg-blue-50",
-                    textColor: "text-blue-900",
+                    color: 'from-blue-500 to-blue-600',
+                    bgColor: 'bg-blue-50',
+                    textColor: 'text-blue-900',
                   },
                   {
                     icon: TrendingUp,
-                    label: "Total Spent",
+                    label: 'Total Spent',
                     value: `$${totalSpent}`,
-                    color: "from-green-500 to-green-600",
-                    bgColor: "bg-green-50",
-                    textColor: "text-green-900",
+                    color: 'from-green-500 to-green-600',
+                    bgColor: 'bg-green-50',
+                    textColor: 'text-green-900',
                   },
                   {
                     icon: Heart,
-                    label: "Wishlist Items",
+                    label: 'Wishlist Items',
                     value: wishlistItems.length.toString(),
-                    color: "from-pink-500 to-pink-600",
-                    bgColor: "bg-pink-50",
-                    textColor: "text-pink-900",
+                    color: 'from-pink-500 to-pink-600',
+                    bgColor: 'bg-pink-50',
+                    textColor: 'text-pink-900',
                   },
                   {
                     icon: Award,
-                    label: "Achievements",
-                    value: achievements.filter((a) => a.earned).length.toString(),
-                    color: "from-purple-500 to-purple-600",
-                    bgColor: "bg-purple-50",
-                    textColor: "text-purple-900",
+                    label: 'Achievements',
+                    value: achievements
+                      .filter((a) => a.earned)
+                      .length.toString(),
+                    color: 'from-purple-500 to-purple-600',
+                    bgColor: 'bg-purple-50',
+                    textColor: 'text-purple-900',
                   },
                 ].map((stat, index) => (
                   <Card
@@ -440,8 +460,14 @@ export default function ProfilePage() {
                       >
                         <stat.icon className="h-6 w-6 text-white" />
                       </div>
-                      <div className={`text-3xl font-bold ${stat.textColor} mb-1`}>{stat.value}</div>
-                      <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                      <div
+                        className={`text-3xl font-bold ${stat.textColor} mb-1`}
+                      >
+                        {stat.value}
+                      </div>
+                      <div className="text-sm text-gray-600 font-medium">
+                        {stat.label}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
@@ -453,17 +479,21 @@ export default function ProfilePage() {
         {/* Enhanced Tabs */}
         <div
           className={`transition-all duration-1000 ease-out delay-300 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-8"
+          >
             <TabsList className="grid h-15 w-full grid-cols-2 md:grid-cols-5 bg-white/80 backdrop-blur-sm border-2 border-amber-200/50 rounded-2xl p-2 shadow-lg">
               {[
-                { value: "profile", icon: User, label: "Profile" },
-                { value: "orders", icon: ShoppingBag, label: "Orders" },
-                { value: "wishlist", icon: Heart, label: "Wishlist" },
-                { value: "addresses", icon: MapPin, label: "Addresses" },
-                { value: "settings", icon: Settings, label: "Settings" },
+                { value: 'profile', icon: User, label: 'Profile' },
+                { value: 'orders', icon: ShoppingBag, label: 'Orders' },
+                { value: 'wishlist', icon: Heart, label: 'Wishlist' },
+                { value: 'addresses', icon: MapPin, label: 'Addresses' },
+                { value: 'settings', icon: Settings, label: 'Settings' },
               ].map((tab) => (
                 <TabsTrigger
                   key={tab.value}
@@ -490,18 +520,28 @@ export default function ProfilePage() {
                   <CardContent className="space-y-6">
                     <div className="grid gap-6">
                       {[
-                        { label: "Full Name", key: "name", type: "text" },
-                        { label: "Email Address", key: "email", type: "email" },
-                        { label: "Phone Number", key: "phone", type: "tel" },
-                        { label: "Address", key: "address", type: "text" },
+                        { label: 'Full Name', key: 'name', type: 'text' },
+                        { label: 'Email Address', key: 'email', type: 'email' },
+                        { label: 'Phone Number', key: 'phone', type: 'tel' },
+                        { label: 'Address', key: 'address', type: 'text' },
                       ].map((field) => (
                         <div key={field.key} className="space-y-2">
-                          <label className="block text-sm font-medium text-amber-900">{field.label}</label>
+                          <label className="block text-sm font-medium text-amber-900">
+                            {field.label}
+                          </label>
                           <Input
                             type={field.type}
-                            value={(userInfo?.[field.key as keyof UserData] as string) ?? ""}
+                            value={
+                              (userInfo?.[
+                                field.key as keyof UserData
+                              ] as string) ?? ''
+                            }
                             onChange={(e) =>
-                              setUserInfo(userInfo ? { ...userInfo, [field.key]: e.target.value } : userInfo)
+                              setUserInfo(
+                                userInfo
+                                  ? { ...userInfo, [field.key]: e.target.value }
+                                  : userInfo,
+                              )
                             }
                             disabled={!isEditing}
                             className="border-2 border-amber-200 focus:border-teal-400 focus:ring-teal-400 rounded-xl transition-all duration-300"
@@ -527,24 +567,28 @@ export default function ProfilePage() {
                           key={achievement.id}
                           className={`flex items-center space-x-4 p-4 rounded-xl border-2 transition-all duration-300 ${
                             achievement.earned
-                              ? "bg-gradient-to-r from-teal-50 to-emerald-50 border-teal-200"
-                              : "bg-gray-50 border-gray-200"
+                              ? 'bg-gradient-to-r from-teal-50 to-emerald-50 border-teal-200'
+                              : 'bg-gray-50 border-gray-200'
                           }`}
                         >
                           <div
                             className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                               achievement.earned
-                                ? "bg-gradient-to-r from-teal-500 to-emerald-500 text-white"
-                                : "bg-gray-300 text-gray-500"
+                                ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white'
+                                : 'bg-gray-300 text-gray-500'
                             }`}
                           >
                             <achievement.icon className="h-6 w-6" />
                           </div>
                           <div className="flex-1">
-                            <h3 className={`font-semibold ${achievement.earned ? "text-teal-900" : "text-gray-600"}`}>
+                            <h3
+                              className={`font-semibold ${achievement.earned ? 'text-teal-900' : 'text-gray-600'}`}
+                            >
                               {achievement.title}
                             </h3>
-                            <p className={`text-sm ${achievement.earned ? "text-teal-700" : "text-gray-500"}`}>
+                            <p
+                              className={`text-sm ${achievement.earned ? 'text-teal-700' : 'text-gray-500'}`}
+                            >
                               {achievement.description}
                             </p>
                           </div>
@@ -570,7 +614,9 @@ export default function ProfilePage() {
                       <Package className="h-5 w-5" />
                       <span>Order History</span>
                     </div>
-                    <Badge className="bg-teal-100 text-teal-800">{recentOrders.length} Orders</Badge>
+                    <Badge className="bg-teal-100 text-teal-800">
+                      {recentOrders.length} Orders
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -584,7 +630,7 @@ export default function ProfilePage() {
                           <div className="flex items-start gap-6">
                             <div className="relative">
                               <img
-                                src={order.image || "/placeholder.svg"}
+                                src={order.image || '/placeholder.svg'}
                                 alt="Order item"
                                 className="w-20 h-20 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300"
                               />
@@ -596,31 +642,45 @@ export default function ProfilePage() {
                             <div className="flex-1 space-y-3">
                               <div className="flex items-start justify-between">
                                 <div>
-                                  <h3 className="font-bold text-amber-900 text-lg">{order.id}</h3>
-                                  <p className="text-amber-700">{order.products.join(", ")}</p>
+                                  <h3 className="font-bold text-amber-900 text-lg">
+                                    {order.id}
+                                  </h3>
+                                  <p className="text-amber-700">
+                                    {order.products.join(', ')}
+                                  </p>
                                   <p className="text-sm text-amber-600 flex items-center space-x-2 mt-1">
                                     <Calendar className="h-4 w-4" />
-                                    <span>{new Date(order.date).toLocaleDateString()}</span>
+                                    <span>
+                                      {new Date(
+                                        order.date,
+                                      ).toLocaleDateString()}
+                                    </span>
                                   </p>
                                 </div>
-                                <Badge className={`${getStatusColor(order.status)} border font-medium px-3 py-1`}>
+                                <Badge
+                                  className={`${getStatusColor(order.status)} border font-medium px-3 py-1`}
+                                >
                                   {order.status}
                                 </Badge>
                               </div>
 
                               <div className="flex items-center justify-between">
-                                <div className="text-2xl font-bold text-amber-900">${order.total}</div>
+                                <div className="text-2xl font-bold text-amber-900">
+                                  ${order.total}
+                                </div>
                                 <div className="flex space-x-3">
                                   <Button
                                     variant="outline"
                                     size="sm"
                                     className="border-amber-300 text-amber-800 hover:bg-amber-50 rounded-xl bg-transparent"
-                                    onClick={() => navigate(`/order/${order.id}`)}
+                                    onClick={() =>
+                                      navigate(`/order/${order.id}`)
+                                    }
                                   >
                                     <Eye className="h-4 w-4 mr-2" />
                                     View Details
                                   </Button>
-                                  {order.status === "Delivered" && (
+                                  {order.status === 'Delivered' && (
                                     <Button
                                       size="sm"
                                       className="bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl"
@@ -650,7 +710,9 @@ export default function ProfilePage() {
                       <Heart className="h-5 w-5" />
                       <span>My Wishlist</span>
                     </div>
-                    <Badge className="bg-pink-100 text-pink-800">{wishlistItems.length} Items</Badge>
+                    <Badge className="bg-pink-100 text-pink-800">
+                      {wishlistItems.length} Items
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -662,7 +724,7 @@ export default function ProfilePage() {
                       >
                         <div className="relative">
                           <img
-                            src={item.image || "/placeholder.svg"}
+                            src={item.image || '/placeholder.svg'}
                             alt={item.name}
                             className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                           />
@@ -677,7 +739,9 @@ export default function ProfilePage() {
                           </div>
                           {!item.inStock && (
                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                              <Badge className="bg-red-500 text-white">Out of Stock</Badge>
+                              <Badge className="bg-red-500 text-white">
+                                Out of Stock
+                              </Badge>
                             </div>
                           )}
                         </div>
@@ -691,15 +755,21 @@ export default function ProfilePage() {
                             <div className="flex items-center space-x-2">
                               <div className="flex items-center">
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                <span className="text-sm font-medium text-amber-700 ml-1">{item.rating}</span>
+                                <span className="text-sm font-medium text-amber-700 ml-1">
+                                  {item.rating}
+                                </span>
                               </div>
                             </div>
 
                             <div className="flex items-center justify-between">
                               <div className="space-y-1">
                                 <div className="flex items-center space-x-2">
-                                  <span className="text-xl font-bold text-amber-900">${item.price}</span>
-                                  <span className="text-sm text-gray-500 line-through">${item.originalPrice}</span>
+                                  <span className="text-xl font-bold text-amber-900">
+                                    ${item.price}
+                                  </span>
+                                  <span className="text-sm text-gray-500 line-through">
+                                    ${item.originalPrice}
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -709,7 +779,9 @@ export default function ProfilePage() {
                               disabled={!item.inStock}
                             >
                               <ShoppingBag className="h-4 w-4 mr-2" />
-                              {item.inStock ? "Add to Cart" : "Notify When Available"}
+                              {item.inStock
+                                ? 'Add to Cart'
+                                : 'Notify When Available'}
                             </Button>
                           </div>
                         </CardContent>
@@ -742,17 +814,21 @@ export default function ProfilePage() {
                         key={address.id}
                         className={`border-2 transition-all duration-300 hover:shadow-lg ${
                           address.isDefault
-                            ? "border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50"
-                            : "border-amber-200/50 hover:border-amber-300"
+                            ? 'border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50'
+                            : 'border-amber-200/50 hover:border-amber-300'
                         }`}
                       >
                         <CardContent className="p-6">
                           <div className="flex justify-between items-start">
                             <div className="space-y-3">
                               <div className="flex items-center space-x-3">
-                                <h3 className="font-bold text-amber-900 text-lg">{address.type}</h3>
+                                <h3 className="font-bold text-amber-900 text-lg">
+                                  {address.type}
+                                </h3>
                                 {address.isDefault && (
-                                  <Badge className="bg-teal-100 text-teal-800 border border-teal-200">Default</Badge>
+                                  <Badge className="bg-teal-100 text-teal-800 border border-teal-200">
+                                    Default
+                                  </Badge>
                                 )}
                               </div>
                               <div className="space-y-1 text-amber-700">
@@ -802,23 +878,26 @@ export default function ProfilePage() {
                   <CardContent className="space-y-6">
                     {[
                       {
-                        label: "Order Updates",
-                        description: "Get notified about your order status changes",
+                        label: 'Order Updates',
+                        description:
+                          'Get notified about your order status changes',
                         icon: Package,
                       },
                       {
-                        label: "Promotions & Deals",
-                        description: "Receive special offers and exclusive deals",
+                        label: 'Promotions & Deals',
+                        description:
+                          'Receive special offers and exclusive deals',
                         icon: Gift,
                       },
                       {
-                        label: "New Arrivals",
-                        description: "Be first to know about new products",
+                        label: 'New Arrivals',
+                        description: 'Be first to know about new products',
                         icon: Sparkles,
                       },
                       {
-                        label: "Price Drops",
-                        description: "Get alerts when wishlist items go on sale",
+                        label: 'Price Drops',
+                        description:
+                          'Get alerts when wishlist items go on sale',
                         icon: TrendingUp,
                       },
                     ].map((setting, index) => (
@@ -831,11 +910,18 @@ export default function ProfilePage() {
                             <setting.icon className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <h4 className="font-semibold text-amber-900">{setting.label}</h4>
-                            <p className="text-sm text-amber-700">{setting.description}</p>
+                            <h4 className="font-semibold text-amber-900">
+                              {setting.label}
+                            </h4>
+                            <p className="text-sm text-amber-700">
+                              {setting.description}
+                            </p>
                           </div>
                         </div>
-                        <Switch defaultChecked className="data-[state=checked]:bg-teal-500" />
+                        <Switch
+                          defaultChecked
+                          className="data-[state=checked]:bg-teal-500"
+                        />
                       </div>
                     ))}
                   </CardContent>
@@ -864,53 +950,57 @@ export default function ProfilePage() {
                   </CardContent>
                 </Card>
 
-                {/* Seller Options */}
-                <Card className="border-amber-200/50 bg-white/80 backdrop-blur-sm shadow-lg">
+                <Card className="border-amber-200">
                   <CardHeader>
-                    <CardTitle className="text-amber-900 flex items-center space-x-2">
-                      <Crown className="h-5 w-5" />
-                      <span>Seller Account</span>
+                    <CardTitle className="text-amber-900">
+                      Change to Seller
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-4">
                     {userInfo?.isSeller ? (
-                      <Link to="/seller/profile">
-                        <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl py-3">
-                          <Crown className="h-4 w-4 mr-2" />
-                          Manage Store
+                      <Link to={'/seller/profile'}>
+                        <Button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white">
+                          Store Page
                         </Button>
                       </Link>
                     ) : (
                       <Button
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl py-3"
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
                         onClick={handleBecomeSeller}
                       >
-                        <Crown className="h-4 w-4 mr-2" />
                         Become a Seller
                       </Button>
                     )}
                   </CardContent>
                 </Card>
+
+                {/* <Card className="border-amber-200">
+                <CardHeader>
+                  <CardTitle className="text-amber-900">Account</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    onClick={handleLogoutClick}
+                    variant="outline"
+                    className="w-full border-red-300 text-red-800 hover:bg-red-50"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </CardContent>
+              </Card> */}
               </div>
             </TabsContent>
           </Tabs>
-        </div>
 
-        {/* Logout Button */}
-        <div
-          className={`mt-8 transition-all duration-1000 ease-out delay-500 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
           <Button
             onClick={handleLogoutClick}
-            className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-4 rounded-xl font-semibold transform hover:scale-105 transition-all duration-300 shadow-lg"
+            className="w-full text-white bg-red-500 hover:bg-red-600 mt-4"
           >
-            <LogOut className="h-5 w-5 mr-2" />
-            Sign Out
+            Logout
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }
