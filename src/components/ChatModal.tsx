@@ -173,76 +173,14 @@ export default function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
     ],
   };
 
-  const getAIResponse = (userMessage: string) => {
-    const message = userMessage.toLowerCase();
-
-    if (
-      message.includes('hello') ||
-      message.includes('hi') ||
-      message.includes('hey')
-    ) {
-      return predefinedResponses.greeting[
-        Math.floor(Math.random() * predefinedResponses.greeting.length)
-      ];
-    }
-    if (
-      message.includes('ship') ||
-      message.includes('delivery') ||
-      message.includes('deliver')
-    ) {
-      return predefinedResponses.shipping[
-        Math.floor(Math.random() * predefinedResponses.shipping.length)
-      ];
-    }
-    if (
-      message.includes('return') ||
-      message.includes('refund') ||
-      message.includes('exchange')
-    ) {
-      return predefinedResponses.returns[
-        Math.floor(Math.random() * predefinedResponses.returns.length)
-      ];
-    }
-    if (
-      message.includes('blockchain') ||
-      message.includes('crypto') ||
-      message.includes('secure')
-    ) {
-      return predefinedResponses.blockchain[
-        Math.floor(Math.random() * predefinedResponses.blockchain.length)
-      ];
-    }
-    if (
-      message.includes('pay') ||
-      message.includes('payment') ||
-      message.includes('card')
-    ) {
-      return predefinedResponses.payment[
-        Math.floor(Math.random() * predefinedResponses.payment.length)
-      ];
-    }
-    if (
-      message.includes('account') ||
-      message.includes('profile') ||
-      message.includes('sign up')
-    ) {
-      return predefinedResponses.account[
-        Math.floor(Math.random() * predefinedResponses.account.length)
-      ];
-    }
-    if (
-      message.includes('product') ||
-      message.includes('item') ||
-      message.includes('buy')
-    ) {
-      return predefinedResponses.products[
-        Math.floor(Math.random() * predefinedResponses.products.length)
-      ];
-    }
-
-    return predefinedResponses.default[
-      Math.floor(Math.random() * predefinedResponses.default.length)
-    ];
+  const getAIResponse = async (userMessage: string) => {
+    const res = await fetch('http://127.0.0.1:8000/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userMessage }),
+    });
+    const data = await res.json();
+    return data;
   };
 
   const scrollToBottom = () => {
@@ -274,21 +212,17 @@ export default function ChatbotModal({ isOpen, onClose }: ChatbotModalProps) {
     setIsTyping(true);
 
     // Simulate AI thinking time
-    setTimeout(
-      () => {
-        const aiResponse = getAIResponse(inputValue);
-        const aiMessage = {
-          id: Date.now() + 1,
-          text: aiResponse,
-          isUser: false,
-          timestamp: new Date(),
-          isTyping: true,
-        };
 
-        setMessages((prev) => [...prev, aiMessage]);
-      },
-      500 + Math.random() * 1000,
-    );
+    const aiResponse = await getAIResponse(inputValue);
+    const aiMessage = {
+      id: Date.now() + 1,
+      text: aiResponse,
+      isUser: false,
+      timestamp: new Date(),
+      isTyping: true,
+    };
+
+    setMessages((prev) => [...prev, aiMessage]);
   };
 
   const handleTypingComplete = () => {
